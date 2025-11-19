@@ -210,3 +210,9 @@ __marimo__/
 claude.md
 gemini.md
 .zed/
+
+# Solar News Crawler specific
+solar_news_crawler/data/
+solar_news_crawler/news_database.db
+solar_news_crawler/scraped_data/
+solar_news_crawler/*.log
