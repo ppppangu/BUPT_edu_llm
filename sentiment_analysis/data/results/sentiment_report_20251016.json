@@ -1,0 +1,105 @@
+{
+  "date": "2025-10-22",
+  "total_posts": 100,
+  "sentiment_distribution": {
+    "positive": 47,
+    "neutral": 29,
+    "negative": 24
+  },
+  "normalized_sentiment_index": 60.109999999930004,
+  "source_statistics": {
+    "eastmoney": {
+      "normalized_index": 62.63999999984,
+      "post_count": 25,
+      "positive_ratio": 0.52
+    },
+    "tieba": {
+      "normalized_index": 59.6,
+      "post_count": 25,
+      "positive_ratio": 0.44
+    },
+    "weibo": {
+      "normalized_index": 63.79999999988,
+      "post_count": 25,
+      "positive_ratio": 0.52
+    },
+    "xueqiu": {
+      "normalized_index": 54.4,
+      "post_count": 25,
+      "positive_ratio": 0.4
+    }
+  },
+  "top_keywords": [
+    [
+      "仅供参考",
+      46
+    ],
+    [
+      "需谨慎",
+      32
+    ],
+    [
+      "个人观点",
+      24
+    ],
+    [
+      "盈亏自负",
+      22
+    ],
+    [
+      "构成",
+      21
+    ],
+    [
+      "分析",
+      21
+    ],
+    [
+      "基本面",
+      21
+    ],
+    [
+      "板块",
+      21
+    ],
+    [
+      "情绪",
+      20
+    ],
+    [
+      "突破",
+      20
+    ],
+    [
+      "建议",
+      20
+    ],
+    [
+      "风险投资",
+      19
+    ],
+    [
+      "放量",
+      19
+    ],
+    [
+      "风险",
+      14
+    ],
+    [
+      "行情",
+      14
+    ]
+  ],
+  "intensity_metrics": {
+    "average_intensity": 0.662666666666,
+    "volatility": 0.7776346188601185
+  },
+  "market_state": "略微乐观",
+  "confidence_score": 1.0,
+  "recommendation": {
+    "outlook": "积极",
+    "action": "考虑逢低布局优质标的",
+    "risk_level": "中等"
+  }
+}

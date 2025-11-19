@@ -1,0 +1,68 @@
+{
+  "generation_time": "2025-10-22T22:44:23.536003",
+  "period_days": 7,
+  "daily_stats": {
+    "20251016": {
+      "total_posts": 100,
+      "sentiment_distribution": {
+        "positive": 16,
+        "negative": 5,
+        "neutral": 79
+      }
+    },
+    "20251017": {
+      "total_posts": 100,
+      "sentiment_distribution": {
+        "positive": 17,
+        "negative": 10,
+        "neutral": 73
+      }
+    },
+    "20251018": {
+      "total_posts": 100,
+      "sentiment_distribution": {
+        "positive": 9,
+        "negative": 4,
+        "neutral": 87
+      }
+    },
+    "20251019": {
+      "total_posts": 100,
+      "sentiment_distribution": {
+        "positive": 11,
+        "negative": 12,
+        "neutral": 77
+      }
+    },
+    "20251020": {
+      "total_posts": 100,
+      "sentiment_distribution": {
+        "positive": 10,
+        "negative": 11,
+        "neutral": 79
+      }
+    },
+    "20251021": {
+      "total_posts": 100,
+      "sentiment_distribution": {
+        "positive": 20,
+        "negative": 7,
+        "neutral": 73
+      }
+    },
+    "20251022": {
+      "total_posts": 100,
+      "sentiment_distribution": {
+        "positive": 11,
+        "negative": 5,
+        "neutral": 84
+      }
+    }
+  },
+  "total_posts": 700,
+  "overall_sentiment": {
+    "positive": 94,
+    "negative": 54,
+    "neutral": 552
+  }
+}

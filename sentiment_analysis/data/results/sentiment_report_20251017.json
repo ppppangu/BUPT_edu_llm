@@ -1,0 +1,105 @@
+{
+  "date": "2025-10-22",
+  "total_posts": 100,
+  "sentiment_distribution": {
+    "positive": 48,
+    "negative": 29,
+    "neutral": 23
+  },
+  "normalized_sentiment_index": 57.652380952419996,
+  "source_statistics": {
+    "eastmoney": {
+      "normalized_index": 64.74285714296,
+      "post_count": 25,
+      "positive_ratio": 0.52
+    },
+    "tieba": {
+      "normalized_index": 56.666666666720005,
+      "post_count": 25,
+      "positive_ratio": 0.56
+    },
+    "weibo": {
+      "normalized_index": 48.2,
+      "post_count": 25,
+      "positive_ratio": 0.4
+    },
+    "xueqiu": {
+      "normalized_index": 61.0,
+      "post_count": 25,
+      "positive_ratio": 0.44
+    }
+  },
+  "top_keywords": [
+    [
+      "需谨慎",
+      52
+    ],
+    [
+      "仅供参考",
+      34
+    ],
+    [
+      "入市",
+      27
+    ],
+    [
+      "突破",
+      26
+    ],
+    [
+      "情绪",
+      25
+    ],
+    [
+      "风险投资",
+      25
+    ],
+    [
+      "风险",
+      21
+    ],
+    [
+      "盈亏自负",
+      20
+    ],
+    [
+      "基本面",
+      20
+    ],
+    [
+      "分析",
+      19
+    ],
+    [
+      "方向",
+      18
+    ],
+    [
+      "选择",
+      18
+    ],
+    [
+      "信号",
+      17
+    ],
+    [
+      "政策",
+      17
+    ],
+    [
+      "放量",
+      16
+    ]
+  ],
+  "intensity_metrics": {
+    "average_intensity": 0.7097619047620001,
+    "volatility": 0.8179154717130481
+  },
+  "market_state": "中性",
+  "confidence_score": 1.0,
+  "recommendation": {
+    "outlook": "中性",
+    "action": "观望为主，谨慎操作",
+    "risk_level": "中等"
+  }
+}

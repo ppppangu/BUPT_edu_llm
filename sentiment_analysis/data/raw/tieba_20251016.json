@@ -1,0 +1,257 @@
+{
+  "source": "tieba",
+  "crawl_time": "2025-10-22T22:44:23.500730",
+  "data_count": 25,
+  "data": [
+    {
+      "title": "横盘调整",
+      "author": "游资传奇",
+      "read_count": 2861,
+      "comment_count": 477,
+      "post_time": "2025-10-17 11:53:23",
+      "content": "{}在{}区间震荡，{}量能萎缩，{}政策明朗方向选择。{}。 市场有风险，投资需谨慎。",
+      "bar_name": "理财吧",
+      "reply_count": "477"
+    },
+    {
+      "title": "春季行情启动",
+      "author": "市场老兵",
+      "read_count": 5056,
+      "comment_count": 346,
+      "post_time": "2025-10-17 10:13:23",
+      "content": "宏观经济环境市场情绪{}，{}形成{}，{}机会凸显。坚定持有{}。 仅供参考，盈亏自负。",
+      "bar_name": "财经吧",
+      "reply_count": "346"
+    },
+    {
+      "title": "趋势向上",
+      "author": "价值投资者",
+      "read_count": 11498,
+      "comment_count": 391,
+      "post_time": "2025-10-17 11:49:23",
+      "content": "{}突破{}关键位置，{}放量上涨，{}行情可期。{}。 以上分析不构成投资建议。",
+      "bar_name": "股市吧",
+      "reply_count": "391"
+    },
+    {
+      "title": "技术修复",
+      "author": "量化投资",
+      "read_count": 2084,
+      "comment_count": 263,
+      "post_time": "2025-10-17 12:23:23",
+      "content": "市场情绪{}，{}转换中{}，{}突破突破。控制仓位{}。 以上分析不构成投资建议。",
+      "bar_name": "股票吧",
+      "reply_count": "263"
+    },
+    {
+      "title": "泡沫破裂",
+      "author": "长线持有",
+      "read_count": 14408,
+      "comment_count": 311,
+      "post_time": "2025-10-17 10:11:23",
+      "content": "{}跌破{}支撑位，{}缩量下跌，{}调整继续。{}。 仅供参考，盈亏自负。",
+      "bar_name": "财经吧",
+      "reply_count": "311"
+    },
+    {
+      "title": "震荡整理",
+      "author": "打板高手",
+      "read_count": 37751,
+      "comment_count": 476,
+      "post_time": "2025-10-17 11:56:23",
+      "content": "行业景气度{}板块{}，{}需要{}观察。{}机构，{}。 以上分析不构成投资建议。",
+      "bar_name": "股市吧",
+      "reply_count": "476"
+    },
+    {
+      "title": "主力出货",
+      "author": "长线持有",
+      "read_count": 49583,
+      "comment_count": 264,
+      "post_time": "2025-10-17 10:19:23",
+      "content": "{}板块{}，{}可能{}，注意{}。{}资金流出，{}。 个人观点，仅供参考。",
+      "bar_name": "财经吧",
+      "reply_count": "264"
+    },
+    {
+      "title": "技术面看好",
+      "author": "财经观察员",
+      "read_count": 19009,
+      "comment_count": 282,
+      "post_time": "2025-10-17 14:21:23",
+      "content": "{}放开{}，{}基本面{}，{}题材股。{}。 仅供参考，盈亏自负。",
+      "bar_name": "投资吧",
+      "reply_count": "282"
+    },
+    {
+      "title": "外资加仓",
+      "author": "打板高手",
+      "read_count": 8871,
+      "comment_count": 488,
+      "post_time": "2025-10-17 14:21:23",
+      "content": "今天{}医药，{}，逢低加仓{}。均线多头排列{}，机构资金加仓{}。 市场有风险，投资需谨慎。",
+      "bar_name": "股市吧",
+      "reply_count": "488"
+    },
+    {
+      "title": "主力出货",
+      "author": "长线持有",
+      "read_count": 43547,
+      "comment_count": 471,
+      "post_time": "2025-10-17 13:34:23",
+      "content": "市场情绪指标显示，市场情绪{}，{}显示{}，需要{}防范风险。止损止盈{}。 市场有风险，投资需谨慎。",
+      "bar_name": "股票吧",
+      "reply_count": "471"
+    },
+    {
+      "title": "观望为主",
+      "author": "股市老司机",
+      "read_count": 29525,
+      "comment_count": 322,
+      "post_time": "2025-10-17 09:50:23",
+      "content": "{}板块{}，{}需要{}观察。{}机构，{}。 以上分析不构成投资建议。",
+      "bar_name": "股票吧",
+      "reply_count": "322"
+    },
+    {
+      "title": "跌破支撑",
+      "author": "基本面研究",
+      "read_count": 34782,
+      "comment_count": 293,
+      "post_time": "2025-10-17 13:22:23",
+      "content": "市场情绪{}，{}显示{}，需要{}防范风险。止损止盈{}。 以上分析不构成投资建议。",
+      "bar_name": "财经吧",
+      "reply_count": "293"
+    },
+    {
+      "title": "主力出货",
+      "author": "价值投资者",
+      "read_count": 8787,
+      "comment_count": 420,
+      "post_time": "2025-10-17 08:30:23",
+      "content": "行业景气度{}板块{}，{}可能{}，注意{}。{}资金流出，{}。 仅供参考，盈亏自负。",
+      "bar_name": "股票吧",
+      "reply_count": "420"
+    },
+    {
+      "title": "买入信号",
+      "author": "长线持有",
+      "read_count": 29772,
+      "comment_count": 259,
+      "post_time": "2025-10-17 08:28:23",
+      "content": "市场情绪{}，{}形成{}，{}机会凸显。坚定持有{}。 仅供参考，盈亏自负。",
+      "bar_name": "股票吧",
+      "reply_count": "259"
+    },
+    {
+      "title": "估值修复空间大",
+      "author": "华尔街之狼",
+      "read_count": 24003,
+      "comment_count": 192,
+      "post_time": "2025-10-17 10:49:23",
+      "content": "{}突破{}关键位置，{}放量上涨，{}行情可期。{}。 个人观点，仅供参考。",
+      "bar_name": "股票吧",
+      "reply_count": "192"
+    },
+    {
+      "title": "监管政策收紧",
+      "author": "华尔街之狼",
+      "read_count": 25510,
+      "comment_count": 495,
+      "post_time": "2025-10-17 09:24:23",
+      "content": "{}板块{}，{}可能{}，注意{}。{}资金流出，{}。 以上分析不构成投资建议。",
+      "bar_name": "投资吧",
+      "reply_count": "495"
+    },
+    {
+      "title": "卖出信号",
+      "author": "打板高手",
+      "read_count": 27899,
+      "comment_count": 156,
+      "post_time": "2025-10-17 11:05:23",
+      "content": "{}板块{}，{}可能{}，注意{}。{}资金流出，{}。 投资有风险，入市需谨慎。",
+      "bar_name": "财经吧",
+      "reply_count": "156"
+    },
+    {
+      "title": "突破压力位",
+      "author": "波段操作",
+      "read_count": 23664,
+      "comment_count": 102,
+      "post_time": "2025-10-17 08:41:23",
+      "content": "{}减税{}，{}基本面{}，{}龙头股。{}。 仅供参考，盈亏自负。",
+      "bar_name": "理财吧",
+      "reply_count": "102"
+    },
+    {
+      "title": "政策暖风频吹",
+      "author": "价值投资者",
+      "read_count": 33672,
+      "comment_count": 10,
+      "post_time": "2025-10-17 10:49:23",
+      "content": "经过{}的分析，{}板块{}，目标价{}。{}资金持续流入，{}。 个人观点，仅供参考。",
+      "bar_name": "投资吧",
+      "reply_count": "10"
+    },
+    {
+      "title": "趋势向上",
+      "author": "短线狙击手",
+      "read_count": 38534,
+      "comment_count": 61,
+      "post_time": "2025-10-17 13:26:23",
+      "content": "市场情绪{}，{}形成{}，{}机会凸显。逢低加仓{}。 个人观点，仅供参考。",
+      "bar_name": "股市吧",
+      "reply_count": "61"
+    },
+    {
+      "title": "方向不明",
+      "author": "量化投资",
+      "read_count": 40772,
+      "comment_count": 238,
+      "post_time": "2025-10-17 14:36:23",
+      "content": "{}政策真空{}，{}数据{}，{}保持耐心。{}。 以上分析不构成投资建议。",
+      "bar_name": "投资吧",
+      "reply_count": "238"
+    },
+    {
+      "title": "大涨在即",
+      "author": "市场老兵",
+      "read_count": 35344,
+      "comment_count": 273,
+      "post_time": "2025-10-17 08:31:23",
+      "content": "资金流向表明，{}减税{}，{}基本面{}，{}龙头股。{}。 市场有风险，投资需谨慎。",
+      "bar_name": "股票吧",
+      "reply_count": "273"
+    },
+    {
+      "title": "资金青睐",
+      "author": "趋势交易者",
+      "read_count": 22843,
+      "comment_count": 176,
+      "post_time": "2025-10-17 10:12:23",
+      "content": "市场情绪{}，{}形成{}，{}机会凸显。适度参与{}。 个人观点，仅供参考。",
+      "bar_name": "投资吧",
+      "reply_count": "176"
+    },
+    {
+      "title": "量能萎缩",
+      "author": "华尔街之狼",
+      "read_count": 4374,
+      "comment_count": 426,
+      "post_time": "2025-10-17 11:47:23",
+      "content": "{}板块{}，{}需要{}观察。{}散户，{}。 个人观点，仅供参考。",
+      "bar_name": "股市吧",
+      "reply_count": "426"
+    },
+    {
+      "title": "买入信号",
+      "author": "华尔街之狼",
+      "read_count": 5141,
+      "comment_count": 141,
+      "post_time": "2025-10-17 10:59:23",
+      "content": "行业景气度经过{}的分析，{}板块{}，目标价{}。{}资金持续流入，{}。 以上分析不构成投资建议。",
+      "bar_name": "投资吧",
+      "reply_count": "141"
+    }
+  ]
+}

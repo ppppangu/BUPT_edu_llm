@@ -1,0 +1,19 @@
+{
+  "source": "weibo",
+  "crawl_time": "2025-10-22T22:45:01.872115",
+  "data_count": 3,
+  "data": [
+    {
+      "title": "A股大涨",
+      "source": "weibo"
+    },
+    {
+      "title": "北向资金",
+      "source": "weibo"
+    },
+    {
+      "title": "证监会最新政策",
+      "source": "weibo"
+    }
+  ]
+}
