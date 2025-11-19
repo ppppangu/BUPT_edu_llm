@@ -216,3 +216,12 @@ solar_news_crawler/data/
 solar_news_crawler/news_database.db
 solar_news_crawler/scraped_data/
 solar_news_crawler/*.log
+
+# Platform specific
+.env
+logs/
+*.pid
+*.log
+
+# Nginx logs (if stored locally)
+nginx/*.log

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUPT EDU LLM - Data Intelligence Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="grid-background"></div>
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo-mark">
+                    <span class="logo-bracket">{</span>
+                    <span class="logo-text">BUPT</span>
+                    <span class="logo-bracket">}</span>
+                </div>
+                <div class="logo-subtitle">Data Intelligence Hub</div>
+            </div>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span class="status-text">All Systems Operational</span>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="hero">
+                <h1 class="hero-title">
+                    <span class="title-line">智能数据</span>
+                    <span class="title-line gradient-text">分析平台</span>
+                </h1>
+                <p class="hero-description">
+                    整合多源数据采集、智能分析与可视化展示的综合平台
+                </p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-projects">--</div>
+                        <div class="stat-label">活跃项目</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-uptime">--</div>
+                        <div class="stat-label">系统在线</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-data">--</div>
+                        <div class="stat-label">数据处理</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="projects-section">
+                <h2 class="section-title">
+                    <span class="title-marker">//</span>
+                    子项目导航
+                </h2>
+
+                <div class="projects-grid" id="projects-container">
+                    <!-- Projects will be dynamically loaded here -->
+                </div>
+            </section>
+
+            <section class="info-section">
+                <div class="info-card">
+                    <h3 class="info-title">关于平台</h3>
+                    <p class="info-text">
+                        本平台致力于构建多领域数据智能分析体系，集成新闻聚合、情感分析、
+                        趋势预测等多个子系统，为教育科研提供强大的数据支持。
+                    </p>
+                </div>
+                <div class="info-card">
+                    <h3 class="info-title">技术栈</h3>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Flask</span>
+                        <span class="tech-tag">Nginx</span>
+                        <span class="tech-tag">Beautiful Soup</span>
+                        <span class="tech-tag">Pandas</span>
+                        <span class="tech-tag">NLP</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <span class="footer-copyright">&copy; 2025 BUPT EDU LLM</span>
+                    <span class="footer-divider">|</span>
+                    <span class="footer-version">v0.1.0</span>
+                </div>
+                <div class="footer-right">
+                    <a href="https://github.com" class="footer-link" target="_blank">GitHub</a>
+                    <span class="footer-divider">|</span>
+                    <a href="#" class="footer-link">Documentation</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
