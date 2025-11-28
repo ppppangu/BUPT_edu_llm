@@ -212,10 +212,10 @@ gemini.md
 .zed/
 
 # Solar News Crawler specific
-solar_news_crawler/data/
-solar_news_crawler/news_database.db
-solar_news_crawler/scraped_data/
-solar_news_crawler/*.log
+projects/solar_news_crawler/data/
+projects/solar_news_crawler/news_database.db
+projects/solar_news_crawler/scraped_data/
+projects/solar_news_crawler/*.log
 
 # Platform specific
 .env
@@ -225,3 +225,6 @@ logs/
 
 # Nginx logs (if stored locally)
 nginx/*.log
+
+# Data
+data/

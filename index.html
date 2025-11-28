@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="zh-CN" class="scroll-smooth">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>EDU LLM Platform - 教育大模型应用平台</title>
+        <meta
+            name="description"
+            content="学生创新实践成果展示平台，集成多领域大模型应用。"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- 引入 Inter字体 (类似 San Francisco) 和 Font Awesome -->
+        <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: [
+                                "Inter",
+                                "-apple-system",
+                                "BlinkMacSystemFont",
+                                "Segoe UI",
+                                "Roboto",
+                                "sans-serif",
+                            ],
+                        },
+                        colors: {
+                            "apple-dark": "#1d1d1f",
+                            "apple-gray": "#86868b",
+                            "apple-light": "#f5f5f7",
+                            "apple-blue": "#0071e3",
+                            "apple-blue-hover": "#0077ed",
+                        },
+                        boxShadow: {
+                            glass: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                            glow: "0 0 20px rgba(0, 113, 227, 0.15)",
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            /* Apple-style Customizations */
+            body {
+                background-color: #fff;
+                color: #1d1d1f;
+                -webkit-font-smoothing: antialiased;
+            }
+
+            /* Navbar Blur */
+            .glass-nav {
+                background: rgba(255, 255, 255, 0.8);
+                backdrop-filter: saturate(180%) blur(20px);
+                -webkit-backdrop-filter: saturate(180%) blur(20px);
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            }
+
+            /* Animations */
+            .fade-in-up {
+                animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            @keyframes fadeInUp {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Scroll Reveal Animation Classes */
+            .reveal-on-scroll {
+                opacity: 0;
+                transform: translateY(40px);
+                transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .reveal-visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            /* Card Hover Effects */
+            .project-card {
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .project-card:hover {
+                transform: scale(1.02);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            }
+
+            /* Bento Grid Item */
+            .bento-item {
+                background: #f5f5f7;
+                border-radius: 20px;
+                overflow: hidden;
+                transition: transform 0.3s ease;
+            }
+            .bento-item:hover {
+                transform: scale(1.01);
+            }
+
+            /* Text Gradient */
+            .text-gradient {
+                background: linear-gradient(135deg, #1d1d1f 0%, #434344 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Navigation -->
+        <nav
+            class="glass-nav fixed w-full z-50 transition-all duration-300"
+            id="navbar"
+        >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-12">
+                    <div class="flex items-center">
+                        <a
+                            href="#"
+                            class="text-xl font-semibold tracking-tight hover:opacity-80 transition-opacity"
+                        >
+                            <i
+                                class="fa-solid fa-graduation-cap mr-2 text-apple-dark"
+                            ></i
+                            >EDU LLM
+                        </a>
+                    </div>
+                    <div class="hidden md:flex space-x-8">
+                        <a
+                            href="#projects"
+                            class="text-xs text-apple-dark hover:text-apple-blue transition-colors"
+                            >项目展示</a
+                        >
+                        <a
+                            href="#features"
+                            class="text-xs text-apple-dark hover:text-apple-blue transition-colors"
+                            >平台特性</a
+                        >
+                        <a
+                            href="#tech"
+                            class="text-xs text-apple-dark hover:text-apple-blue transition-colors"
+                            >技术架构</a
+                        >
+                        <a
+                            href="#docs"
+                            class="text-xs text-apple-dark hover:text-apple-blue transition-colors"
+                            >文档</a
+                        >
+                    </div>
+                    <div>
+                        <a
+                            href="https://github.com/ppppangu/BUPT_edu_llm"
+                            target="_blank"
+                            class="text-xs bg-apple-dark text-white px-3 py-1.5 rounded-full hover:bg-black transition-colors"
+                        >
+                            GitHub <i class="fab fa-github ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="relative pt-40 pb-20 lg:pt-52 lg:pb-32 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="fade-in-up">
+                    <h2
+                        class="text-apple-blue font-semibold text-lg md:text-xl mb-6 tracking-wide"
+                    >
+                        源于学生创新 · 赋能行业实践
+                    </h2>
+                    <h1
+                        class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8 text-apple-dark leading-tight"
+                    >
+                        教育大模型 <br />
+                        <span class="text-gray-400">智能应用平台</span>
+                    </h1>
+                    <p
+                        class="mt-8 max-w-2xl mx-auto text-xl md:text-2xl text-apple-gray font-medium leading-relaxed"
+                    >
+                        汇聚多源数据，集成前沿大模型能力。<br
+                            class="hidden md:block"
+                        />
+                        我们将每一个灵感孵化为独立的智能微服务，<br
+                            class="hidden md:block"
+                        />
+                        探索教育与 AI 深度融合的无限疆界。
+                    </p>
+                    <div class="mt-12 flex justify-center gap-6">
+                        <a
+                            href="#projects"
+                            class="px-8 py-3 bg-apple-blue text-white rounded-full font-medium hover:bg-apple-blue-hover transition-all transform hover:scale-105 shadow-glow"
+                        >
+                            开始体验
+                        </a>
+                        <a
+                            href="https://github.com/ppppangu/BUPT_edu_llm"
+                            class="px-8 py-3 text-apple-blue bg-blue-50 rounded-full font-medium hover:bg-blue-100 transition-all"
+                        >
+                            了解架构
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Bento Grid -->
+        <section id="features" class="py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 reveal-on-scroll">
+                    <h2
+                        class="text-4xl md:text-5xl font-bold text-apple-dark mb-4"
+                    >
+                        不仅是展示，<br class="md:hidden" />更是架构的艺术。
+                    </h2>
+                    <p class="text-xl text-apple-gray mt-4">
+                        模块化设计，统一入口，自动化运维。
+                    </p>
+                </div>
+
+                <div
+                    class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]"
+                >
+                    <!-- Large Item -->
+                    <div
+                        class="bento-item md:col-span-2 p-10 flex flex-col justify-between relative group reveal-on-scroll"
+                        style="transition-delay: 100ms"
+                    >
+                        <div class="z-10">
+                            <h3 class="text-2xl font-bold mb-2">微服务架构</h3>
+                            <p class="text-apple-gray text-lg">
+                                每个子项目独立开发、独立部署，互不干扰。通过
+                                Nginx
+                                反向代理实现统一访问体验，确保系统的高可用性与扩展性。
+                            </p>
+                        </div>
+                        <div
+                            class="absolute right-0 bottom-0 w-1/2 h-full opacity-10 group-hover:opacity-20 transition-opacity"
+                        >
+                            <i
+                                class="fa-solid fa-server text-9xl absolute bottom-[-20px] right-[-20px]"
+                            ></i>
+                        </div>
+                        <div class="mt-auto">
+                            <span
+                                class="text-apple-blue font-semibold cursor-pointer hover:underline"
+                                >了解架构设计 ></span
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Tall Item -->
+                    <div
+                        class="bento-item p-8 flex flex-col justify-center items-center text-center relative overflow-hidden group reveal-on-scroll"
+                        style="transition-delay: 200ms"
+                    >
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                        ></div>
+                        <div
+                            class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 text-3xl text-apple-blue z-10"
+                        >
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 z-10">AI 能力集成</h3>
+                        <p class="text-sm text-apple-gray z-10">
+                            深度整合大语言模型，支持智能分析与上下文理解，让数据开口说话。
+                        </p>
+                    </div>
+
+                    <!-- Wide Item -->
+                    <div
+                        class="bento-item md:col-span-2 p-10 flex items-center justify-between group reveal-on-scroll"
+                        style="transition-delay: 100ms"
+                    >
+                        <div class="max-w-md">
+                            <h3 class="text-2xl font-bold mb-2">自动化运维</h3>
+                            <p class="text-apple-gray text-lg">
+                                定时任务自动更新数据，无需人工干预。全天候保持数据鲜活，让洞察永远快人一步。
+                            </p>
+                        </div>
+                        <div
+                            class="text-6xl text-gray-300 group-hover:text-apple-blue transition-colors duration-500"
+                        >
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                    </div>
+
+                    <!-- Small Item -->
+                    <div
+                        class="bento-item p-8 flex flex-col justify-center bg-black text-white reveal-on-scroll"
+                        style="transition-delay: 200ms"
+                    >
+                        <h3 class="text-xl font-bold mb-2">统一入口</h3>
+                        <p class="text-gray-400 text-sm">www.edubeam.cn</p>
+                        <div class="mt-4 flex gap-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div
+                                class="w-3 h-3 rounded-full bg-yellow-500"
+                            ></div>
+                            <div
+                                class="w-3 h-3 rounded-full bg-green-500"
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-24 bg-apple-light">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div
+                    class="flex justify-between items-end mb-12 reveal-on-scroll"
+                >
+                    <div>
+                        <h2 class="text-4xl font-bold text-apple-dark">
+                            精选子项目
+                        </h2>
+                        <p class="mt-2 text-apple-gray text-lg">
+                            实时的行业洞察与情绪追踪。
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                >
+                    <!-- Project Card 1: Solar News -->
+                    <div
+                        class="project-card bg-white rounded-3xl p-8 flex flex-col h-full border border-gray-100 reveal-on-scroll"
+                        style="transition-delay: 100ms"
+                    >
+                        <div
+                            class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl mb-6"
+                        >
+                            <i class="fa-solid fa-sun"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3">
+                            Solar News Crawler
+                        </h3>
+                        <p class="text-apple-gray mb-6 flex-grow">
+                            光伏行业新闻聚合平台，整合国内外权威信息源，提供实时行业动态。
+                        </p>
+                        <div
+                            class="flex items-center justify-between mt-auto pt-6 border-t border-gray-50"
+                        >
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                            >
+                                已上线
+                            </span>
+                            <a
+                                href="/solar_news/"
+                                class="text-apple-blue hover:text-apple-blue-hover text-sm font-semibold flex items-center group"
+                            >
+                                查看详情
+                                <i
+                                    class="fa-solid fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"
+                                ></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 2: Alpha Sentiment (Updated) -->
+                    <div
+                        class="project-card bg-white rounded-3xl p-8 flex flex-col h-full border border-gray-100 reveal-on-scroll"
+                        style="transition-delay: 200ms"
+                    >
+                        <div
+                            class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl mb-6"
+                        >
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3">Alpha Sentiment</h3>
+                        <p class="text-apple-gray mb-6 flex-grow">
+                            A股市场情绪分析终端，利用<strong>大模型技术</strong>实时追踪并量化市场情绪指标，捕捉非结构化数据中的价值。
+                        </p>
+                        <div
+                            class="flex items-center justify-between mt-auto pt-6 border-t border-gray-50"
+                        >
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                            >
+                                已上线
+                            </span>
+                            <a
+                                href="/alpha_sentiment/"
+                                class="text-apple-blue hover:text-apple-blue-hover text-sm font-semibold flex items-center group"
+                            >
+                                查看详情
+                                <i
+                                    class="fa-solid fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"
+                                ></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 3: Coming Soon -->
+                    <div
+                        class="project-card bg-white rounded-3xl p-8 flex flex-col h-full border border-dashed border-gray-300 relative overflow-hidden reveal-on-scroll"
+                        style="transition-delay: 300ms"
+                    >
+                        <div
+                            class="absolute inset-0 bg-gray-50/50 flex items-center justify-center z-10"
+                        >
+                            <span class="text-apple-gray font-semibold"
+                                >更多项目孵化中...</span
+                            >
+                        </div>
+                        <div
+                            class="w-12 h-12 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center text-xl mb-6 blur-sm"
+                        >
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 blur-sm">
+                            Trend Predictor
+                        </h3>
+                        <p class="text-apple-gray mb-6 flex-grow blur-sm">
+                            基于历史数据的 AI 趋势预测模型。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack Scroller -->
+        <section id="tech" class="py-24 overflow-hidden bg-white">
+            <div
+                class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12 reveal-on-scroll"
+            >
+                <h2 class="text-3xl font-bold text-apple-dark">强劲内核</h2>
+                <p class="mt-2 text-apple-gray text-lg">
+                    构建于现代技术栈之上，稳定而高效。
+                </p>
+            </div>
+
+            <!-- Marquee Effect -->
+            <div class="relative flex overflow-x-hidden group reveal-on-scroll">
+                <div
+                    class="animate-marquee whitespace-nowrap flex space-x-12 items-center"
+                >
+                    <!-- Tech Icons (Duplicated for infinite scroll) -->
+                    <span
+                        class="text-4xl text-gray-400 hover:text-yellow-500 transition-colors"
+                        ><i class="fab fa-python"></i
+                    ></span>
+                    <span class="text-2xl font-bold text-gray-400">Flask</span>
+                    <span class="text-2xl font-bold text-gray-400"
+                        >FastAPI</span
+                    >
+                    <span
+                        class="text-4xl text-gray-400 hover:text-green-600 transition-colors"
+                        ><i class="fas fa-server"></i
+                    ></span>
+                    <span class="text-2xl font-bold text-gray-400">Nginx</span>
+                    <span
+                        class="text-4xl text-gray-400 hover:text-blue-500 transition-colors"
+                        ><i class="fab fa-docker"></i
+                    ></span>
+                    <span class="text-2xl font-bold text-gray-400"
+                        >Selenium</span
+                    >
+                    <span class="text-2xl font-bold text-gray-400">Pandas</span>
+                    <span class="text-2xl font-bold text-gray-400"
+                        >PyTorch</span
+                    >
+                    <span
+                        class="text-4xl text-gray-400 hover:text-orange-500 transition-colors"
+                        ><i class="fab fa-html5"></i
+                    ></span>
+
+                    <!-- Duplicate -->
+                    <span
+                        class="text-4xl text-gray-400 hover:text-yellow-500 transition-colors"
+                        ><i class="fab fa-python"></i
+                    ></span>
+                    <span class="text-2xl font-bold text-gray-400">Flask</span>
+                    <span class="text-2xl font-bold text-gray-400"
+                        >FastAPI</span
+                    >
+                    <span
+                        class="text-4xl text-gray-400 hover:text-green-600 transition-colors"
+                        ><i class="fas fa-server"></i
+                    ></span>
+                    <span class="text-2xl font-bold text-gray-400">Nginx</span>
+                    <span
+                        class="text-4xl text-gray-400 hover:text-blue-500 transition-colors"
+                        ><i class="fab fa-docker"></i
+                    ></span>
+                    <span class="text-2xl font-bold text-gray-400"
+                        >Selenium</span
+                    >
+                    <span class="text-2xl font-bold text-gray-400">Pandas</span>
+                    <span class="text-2xl font-bold text-gray-400"
+                        >PyTorch</span
+                    >
+                    <span
+                        class="text-4xl text-gray-400 hover:text-orange-500 transition-colors"
+                        ><i class="fab fa-html5"></i
+                    ></span>
+                </div>
+
+                <div
+                    class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white to-transparent z-10"
+                ></div>
+                <div
+                    class="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white to-transparent z-10"
+                ></div>
+            </div>
+
+            <style>
+                .animate-marquee {
+                    animation: marquee 25s linear infinite;
+                }
+                @keyframes marquee {
+                    0% {
+                        transform: translateX(0);
+                    }
+                    100% {
+                        transform: translateX(-50%);
+                    }
+                }
+            </style>
+        </section>
+
+        <!-- Quick Start / Footer Area -->
+        <section id="docs" class="bg-apple-light py-20">
+            <div class="max-w-4xl mx-auto px-4 text-center reveal-on-scroll">
+                <h2 class="text-3xl font-bold mb-6">准备好开始了吗？</h2>
+                <p class="text-apple-gray mb-10 text-lg">
+                    克隆仓库，配置环境，只需几步即可在本地运行完整的教育大模型平台。
+                </p>
+                <div
+                    class="bg-white p-6 rounded-2xl shadow-sm text-left max-w-2xl mx-auto border border-gray-200"
+                >
+                    <div class="flex gap-2 mb-4">
+                        <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                    </div>
+                    <code class="font-mono text-sm text-gray-700 block mb-2">
+                        <span class="text-purple-600">git</span> clone
+                        https://github.com/ppppangu/BUPT_edu_llm.git
+                    </code>
+                    <code class="font-mono text-sm text-gray-700 block mb-2">
+                        <span class="text-purple-600">cd</span>
+                        BUPT_edu_llm/projects/solar_news_crawler
+                    </code>
+                    <code class="font-mono text-sm text-gray-700 block">
+                        <span class="text-purple-600">uv</span> run python -m
+                        backend.main
+                    </code>
+                </div>
+                <div class="mt-10">
+                    <a
+                        href="https://github.com/ppppangu/BUPT_edu_llm/blob/main/docs/CONTRIBUTING.md"
+                        target="_blank"
+                        class="text-apple-blue hover:underline text-sm font-medium"
+                        >阅读贡献指南
+                        <i class="fa-solid fa-chevron-right text-xs ml-1"></i
+                    ></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer
+            class="bg-white border-t border-gray-200 pt-16 pb-8 text-xs text-apple-gray"
+        >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                    <div>
+                        <h3 class="font-semibold text-apple-dark mb-3">平台</h3>
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="#projects" class="hover:underline"
+                                    >子项目概览</a
+                                >
+                            </li>
+                            <li>
+                                <a href="#features" class="hover:underline"
+                                    >特性介绍</a
+                                >
+                            </li>
+                            <li>
+                                <a href="#" class="hover:underline">更新日志</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-apple-dark mb-3">资源</h3>
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="#" class="hover:underline">API 文档</a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/ppppangu/BUPT_edu_llm/blob/main/docs/DEPLOY_GUIDE.md" target="_blank" class="hover:underline">部署指南</a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/ppppangu/BUPT_edu_llm/blob/main/docs/CONTRIBUTING.md" target="_blank" class="hover:underline">贡献代码</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-apple-dark mb-3">关于</h3>
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="#" class="hover:underline"
+                                    >BUPT EDU Team</a
+                                >
+                            </li>
+                            <li>
+                                <a href="#" class="hover:underline">联系我们</a>
+                            </li>
+                            <li>
+                                <a href="#" class="hover:underline">隐私政策</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div
+                    class="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center"
+                >
+                    <p>
+                        Copyright © 2025 BUPT EDU LLM Platform. All rights
+                        reserved.
+                    </p>
+                    <div class="mt-4 md:mt-0">
+                        <span class="mr-4"
+                            >Built with passion for education</span
+                        >
+                        <a href="#" class="hover:text-apple-dark"
+                            >MIT License</a
+                        >
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // Navbar scroll effect
+            window.addEventListener("scroll", () => {
+                const nav = document.getElementById("navbar");
+                if (window.scrollY > 20) {
+                    nav.classList.add("shadow-sm");
+                    nav.classList.replace("bg-opacity-0", "bg-opacity-80");
+                } else {
+                    nav.classList.remove("shadow-sm");
+                    nav.classList.replace("bg-opacity-80", "bg-opacity-0");
+                }
+            });
+
+            // Intersection Observer for Reveal on Scroll
+            const observerOptions = {
+                root: null,
+                rootMargin: "0px",
+                threshold: 0.1,
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("reveal-visible");
+                        observer.unobserve(entry.target); // Only animate once
+                    }
+                });
+            }, observerOptions);
+
+            document
+                .querySelectorAll(".reveal-on-scroll")
+                .forEach((element) => {
+                    observer.observe(element);
+                });
+        </script>
+    </body>
+</html>

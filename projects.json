@@ -1,0 +1,34 @@
+{
+  "projects": [
+    {
+      "id": "solar_news_crawler",
+      "name": "Solar News Crawler",
+      "icon": "☀️",
+      "description": "多来源国际太阳能新闻聚合系统，自动抓取、翻译和展示全球太阳能行业动态",
+      "path": "/solar_news/",
+      "activate": true,
+      "tags": ["新闻聚合"],
+      "metadata": {
+        "version": "v0.1.0"
+      },
+      "env_vars": [
+        {
+          "name": "SOLAR_NEWS_PORT",
+          "description": "服务端口",
+          "required": true,
+          "default": "5000"
+        },
+        {
+          "name": "SOLAR_NEWS_WORKERS",
+          "description": "工作进程数",
+          "required": false,
+          "default": "4"
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "totalProjects": 1,
+    "activeProjects": 1
+  }
+}

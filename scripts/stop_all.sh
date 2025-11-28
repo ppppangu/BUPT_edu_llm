@@ -1,71 +1,66 @@
 #!/bin/bash
-
-# BUPT EDU LLM Platform - Stop All Services
-# This script stops all running subprojects
+# Stop all services for BUPT EDU LLM Platform
+# Usage: ./stop_all.sh
 
 set -e
 
-# Colors for output
+# ============================================
+# 日志函数（自包含）
+# ============================================
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Get the project root directory
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+log_info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
+log_warn()    { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_error()   { echo -e "${RED}[ERROR]${NC} $1"; }
 
-echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}  BUPT EDU LLM Platform Shutdown${NC}"
-echo -e "${BLUE}========================================${NC}"
-echo ""
+# ============================================
+# 路径设置
+# ============================================
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PID_DIR="$PROJECT_ROOT/.pids"
 
-# Function to stop a service
-stop_service() {
-    local service_name=$1
-    local pid_file="${PROJECT_ROOT}/logs/${service_name}.pid"
+log_info "=========================================="
+log_info "BUPT EDU LLM Platform 停止脚本"
+log_info "=========================================="
 
-    echo -e "${BLUE}Stopping ${service_name}...${NC}"
+if [ ! -d "$PID_DIR" ]; then
+    log_warn "PID 目录不存在: $PID_DIR"
+    exit 0
+fi
 
+# Stop all services by reading PID files
+for pid_file in "$PID_DIR"/*.pid; do
     if [ -f "$pid_file" ]; then
-        local pid=$(cat "$pid_file")
+        service_name=$(basename "$pid_file" .pid)
+        pid=$(cat "$pid_file")
+
+        log_info "停止 $service_name (PID: $pid)..."
 
         if ps -p $pid > /dev/null 2>&1; then
-            kill $pid
-            sleep 2
+            kill $pid 2>/dev/null || true
+            sleep 1
 
             # Force kill if still running
             if ps -p $pid > /dev/null 2>&1; then
-                echo -e "${YELLOW}  Force killing ${service_name}...${NC}"
-                kill -9 $pid
+                log_warn "强制终止 $service_name..."
+                kill -9 $pid 2>/dev/null || true
             fi
 
-            echo -e "${GREEN}  ${service_name} stopped${NC}"
+            log_success "$service_name 已停止"
         else
-            echo -e "${YELLOW}  ${service_name} is not running${NC}"
+            log_warn "$service_name 未在运行"
         fi
 
         rm "$pid_file"
-    else
-        echo -e "${YELLOW}  PID file not found for ${service_name}${NC}"
     fi
-}
+done
 
-# Stop all services
-stop_service "solar_news_crawler"
-# stop_service "sentiment_analysis"
-
-# Optionally stop Nginx
-# echo -e "${BLUE}Stopping Nginx (if managed by systemd)...${NC}"
-# if systemctl is-active --quiet nginx; then
-#     sudo systemctl stop nginx
-#     echo -e "${GREEN}  Nginx stopped${NC}"
-# else
-#     echo -e "${YELLOW}  Nginx is not running${NC}"
-# fi
-
-echo ""
-echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}  All services stopped successfully!${NC}"
-echo -e "${GREEN}========================================${NC}"
-echo ""
+log_info "=========================================="
+log_success "所有服务已停止"
+log_info "=========================================="
