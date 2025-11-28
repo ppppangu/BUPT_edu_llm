@@ -228,3 +228,7 @@ nginx/*.log
 
 # Data
 data/
+
+# Windows reserved names
+nul
+NUL

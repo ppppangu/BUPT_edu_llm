@@ -7,17 +7,17 @@ from typing import Dict, List, Optional
 
 import requests
 
-from backend.config import AI_API_KEY, AI_BASE_URL, AI_ENABLED, AI_MODEL, DATA_DIR
+from backend.config import LLM_API_KEY, LLM_BASE_URL, LLM_ENABLED, LLM_MODEL, DATA_DIR
 
 
 class AISummarizerService:
     """AI新闻总结服务"""
 
     def __init__(self):
-        self.base_url = AI_BASE_URL.rstrip("/") if AI_BASE_URL else ""
-        self.api_key = AI_API_KEY
-        self.model = AI_MODEL
-        self.enabled = AI_ENABLED
+        self.base_url = LLM_BASE_URL.rstrip("/") if LLM_BASE_URL else ""
+        self.api_key = LLM_API_KEY
+        self.model = LLM_MODEL
+        self.enabled = LLM_ENABLED
 
     def _call_llm(self, messages: List[Dict[str, str]], temperature: float = 0.7) -> str:
         """调用大语言模型API"""

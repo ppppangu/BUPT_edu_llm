@@ -18,11 +18,11 @@ PORT = int(os.getenv("SOLAR_NEWS_PORT", "5000"))
 WORKERS = int(os.getenv("SOLAR_NEWS_WORKERS", "4"))
 LOG_LEVEL = os.getenv("SOLAR_NEWS_LOG_LEVEL", "INFO")
 
-# AI 配置
-AI_BASE_URL = os.getenv("AI_BASE_URL", "")
-AI_API_KEY = os.getenv("AI_API_KEY", "")
-AI_MODEL = os.getenv("AI_MODEL", "gpt-3.5-turbo")
-AI_ENABLED = bool(AI_BASE_URL and AI_API_KEY)
+# LLM 配置（统一命名，两个项目共用）
+LLM_API_KEY = os.getenv("LLM_API_KEY", "")
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "")
+LLM_MODEL = os.getenv("LLM_MODEL", "gpt-3.5-turbo")
+LLM_ENABLED = bool(LLM_BASE_URL and LLM_API_KEY)
 
 # 定时任务配置
 SCHEDULER_HOUR = int(os.getenv("SCHEDULER_HOUR", "2"))  # 凌晨2点执行

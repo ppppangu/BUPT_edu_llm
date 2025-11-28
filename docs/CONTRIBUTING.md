@@ -10,6 +10,7 @@
 - [环境变量说明](#环境变量说明)
 - [常见问题](#常见问题)
 - [附录：部署脚本模板](#附录部署脚本模板)
+- [附录：LLM 环境变量配置](#附录llm-环境变量配置)
 
 ---
 
@@ -391,6 +392,52 @@ log_success "=========================================="
 log_success "$PROJECT_NAME 部署完成"
 log_success "=========================================="
 ```
+
+---
+
+## 附录：LLM 环境变量配置
+
+平台内所有子项目使用**统一的 LLM 环境变量命名**，便于配置管理和密钥复用。
+
+### 变量说明
+
+| 变量名 | 说明 | 必填 | 示例值 |
+|--------|------|------|--------|
+| `LLM_API_KEY` | API 密钥 | 视功能而定 | `sk-xxx...` |
+| `LLM_BASE_URL` | API 基础地址（不以 `/` 结尾） | 视功能而定 | `https://api.deepseek.com` |
+| `LLM_MODEL` | 模型名称 | 否 | `deepseek-chat` / `gpt-3.5-turbo` |
+
+### 各项目默认值
+
+| 项目 | LLM_BASE_URL 默认值 | LLM_MODEL 默认值 | 用途 |
+|------|---------------------|------------------|------|
+| alpha_sentiment | `https://api.deepseek.com` | `deepseek-chat` | 股票新闻情绪分析 |
+| solar_news_crawler | （空，需手动配置） | `gpt-3.5-turbo` | 新闻 AI 总结 |
+
+### 配置示例
+
+```bash
+# .env 文件示例（使用 DeepSeek）
+LLM_API_KEY=sk-your-deepseek-api-key
+LLM_BASE_URL=https://api.deepseek.com
+LLM_MODEL=deepseek-chat
+
+# 或使用 OpenAI
+LLM_API_KEY=sk-your-openai-api-key
+LLM_BASE_URL=https://api.openai.com/v1
+LLM_MODEL=gpt-4o-mini
+
+# 或使用其他兼容 OpenAI API 的服务
+LLM_API_KEY=your-api-key
+LLM_BASE_URL=https://your-api-endpoint.com/v1
+LLM_MODEL=your-model-name
+```
+
+### 注意事项
+
+1. **密钥安全**：`.env` 文件已加入 `.gitignore`，**绝对不要**提交包含真实密钥的文件
+2. **功能降级**：如果未配置 LLM 相关变量，相关功能会自动禁用（不影响其他功能）
+3. **统一配置**：如果两个项目部署在同一台机器，可以配置相同的环境变量复用 API 密钥
 
 ---
 

@@ -6,7 +6,7 @@ import re
 from openai import OpenAI
 from typing import Optional
 
-from ..config import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL
+from ..config import LLM_API_KEY, LLM_BASE_URL, LLM_MODEL
 
 logger = logging.getLogger(__name__)
 
@@ -15,14 +15,14 @@ class SentimentAnalyzer:
     """情绪分析器"""
 
     def __init__(self):
-        """初始化 DeepSeek 客户端"""
-        if not DEEPSEEK_API_KEY:
-            logger.warning("DEEPSEEK_API_KEY 未设置，情绪分析功能不可用")
+        """初始化 LLM 客户端"""
+        if not LLM_API_KEY:
+            logger.warning("LLM_API_KEY 未设置，情绪分析功能不可用")
             self.client = None
         else:
             self.client = OpenAI(
-                api_key=DEEPSEEK_API_KEY,
-                base_url=DEEPSEEK_BASE_URL
+                api_key=LLM_API_KEY,
+                base_url=LLM_BASE_URL
             )
 
     def _extract_json(self, text: str) -> str:
@@ -126,7 +126,7 @@ class SentimentAnalyzer:
             分析结果字典，失败时返回 None
         """
         if not self.client:
-            logger.error("DeepSeek 客户端未初始化")
+            logger.error("LLM 客户端未初始化")
             return None
 
         if not news_list:
@@ -165,7 +165,7 @@ class SentimentAnalyzer:
 
         try:
             response = self.client.chat.completions.create(
-                model="deepseek-chat",
+                model=LLM_MODEL,
                 messages=[
                     {"role": "system", "content": "你是一位专业的股票分析师，擅长从新闻中分析市场情绪。请以 JSON 格式返回分析结果。"},
                     {"role": "user", "content": prompt}
@@ -177,7 +177,7 @@ class SentimentAnalyzer:
 
             result_text = response.choices[0].message.content
             if not result_text:
-                logger.warning(f"股票 {stock_name} DeepSeek 返回为空")
+                logger.warning(f"股票 {stock_name} LLM 返回为空")
                 return None
 
             cleaned = self._extract_json(result_text)

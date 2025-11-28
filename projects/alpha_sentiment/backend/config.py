@@ -14,9 +14,10 @@ load_dotenv(PROJECT_DIR / ".env", override=True)
 DATA_DIR = PROJECT_DIR / "data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-# 环境变量配置（带 ALPHA_SENTIMENT_ 前缀防止冲突）
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
-DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+# LLM 配置（统一命名，两个项目共用）
+LLM_API_KEY = os.getenv("LLM_API_KEY", "")
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.deepseek.com")
+LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-chat")
 
 # 数据配置
 MAX_HOT_STOCKS = int(os.getenv("ALPHA_SENTIMENT_MAX_HOT_STOCKS", "20"))

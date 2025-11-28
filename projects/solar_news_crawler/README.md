@@ -108,9 +108,9 @@ solar_news_crawler/
 | SOLAR_NEWS_WORKERS | 工作进程数 | 否 | 4 |
 | SCHEDULER_HOUR | 定时任务执行小时 | 否 | 2 |
 | SCHEDULER_MINUTE | 定时任务执行分钟 | 否 | 0 |
-| AI_BASE_URL | AI API 地址 | 否 | - |
-| AI_API_KEY | AI API 密钥 | 否 | - |
-| AI_MODEL | AI 模型名称 | 否 | gpt-3.5-turbo |
+| LLM_BASE_URL | LLM API 地址 | 否 | - |
+| LLM_API_KEY | LLM API 密钥 | 否 | - |
+| LLM_MODEL | LLM 模型名称 | 否 | gpt-3.5-turbo |
 
 ## 本地开发
 

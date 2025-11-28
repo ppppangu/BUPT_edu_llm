@@ -40,17 +40,10 @@ log_info "=========================================="
 # Create PID directory
 mkdir -p "$PID_DIR"
 
-# Check for python (for JSON parsing)
-if ! command -v python &> /dev/null; then
-    log_error "未找到 python 命令"
-    exit 1
-fi
+# 项目列表（静态配置）
+PROJECTS="solar_news_crawler alpha_sentiment"
 
-# Start activated projects from projects.json
-log_info "读取 projects.json，启动已激活的项目..."
-
-cd "$PROJECT_ROOT"
-PROJECTS=$(python -c "import json; print('\n'.join([p['id'] for p in json.load(open('projects.json'))['projects'] if p.get('activate', False)]))")
+log_info "启动项目: $PROJECTS"
 
 for project_id in $PROJECTS; do
     # 新路径：projects/<project_id>/scripts/deploy.sh

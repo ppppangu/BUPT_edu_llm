@@ -97,6 +97,34 @@ def generate_static_data():
 scheduler = BackgroundScheduler()
 
 
+def check_data_needs_refresh() -> bool:
+    """
+    检查是否需要刷新数据
+
+    Returns:
+        True 如果需要刷新（无数据或数据过期）
+    """
+    # 检查 combined_*.json 是否存在（国内新闻是基础数据）
+    combined_file = find_latest_file("combined_*.json")
+
+    if not combined_file:
+        print("未找到数据文件，需要初始化数据")
+        return True
+
+    # 检查数据是否过期（不是今天的）
+    try:
+        file_mtime = datetime.fromtimestamp(os.path.getmtime(combined_file))
+        if file_mtime.date() < datetime.now().date():
+            print(f"数据已过期（{file_mtime.date()}），需要刷新")
+            return True
+    except Exception as e:
+        print(f"检查数据日期失败: {e}，将刷新数据")
+        return True
+
+    print(f"数据已是最新（{file_mtime.date()}），无需刷新")
+    return False
+
+
 def start_scheduler():
     """启动调度器"""
     if scheduler.running:
@@ -111,6 +139,16 @@ def start_scheduler():
         name='每日爬虫任务',
         replace_existing=True
     )
+
+    # 检查是否需要立即刷新数据
+    if check_data_needs_refresh():
+        print("将在启动后立即执行一次数据刷新...")
+        scheduler.add_job(
+            daily_crawl_task,
+            'date',  # 立即执行
+            id='initial_crawl',
+            name='初始数据刷新'
+        )
 
     scheduler.start()
     print(f"调度器已启动，每日 {SCHEDULER_HOUR:02d}:{SCHEDULER_MINUTE:02d} 执行爬虫任务")
