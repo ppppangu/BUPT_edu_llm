@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmwise - Fresh Local Produce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            border-color: rgb(229, 231, 235);
+        }
+        body {
+            background-color: rgb(255, 255, 255);
+            color: rgb(15, 23, 42);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .dark-mode body {
+            background-color: rgb(15, 23, 42);
+            color: rgb(226, 232, 240);
+        }
+        .text-muted-foreground {
+            color: rgb(100, 116, 139);
+        }
+        .bg-green-50 {
+            background-color: rgb(240, 253, 244);
+        }
+        .bg-amber-50 {
+            background-color: rgb(254, 252, 231);
+        }
+        .text-green-600 {
+            color: rgb(22, 163, 74);
+        }
+        .text-green-700 {
+            color: rgb(20, 141, 64);
+        }
+        .hover\:text-green-600:hover {
+            color: rgb(22, 163, 74);
+        }
+        .bg-green-600 {
+            background-color: rgb(22, 163, 74);
+        }
+        .hover\:bg-green-700:hover {
+            background-color: rgb(20, 141, 64);
+        }
+        .bg-green-100 {
+            background-color: rgb(220, 252, 231);
+        }
+        .bg-green-100 {
+            background-color: rgb(220, 252, 231);
+        }
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+        .hover\:shadow-md:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .badge-green {
+            background-color: rgb(240, 253, 244);
+            color: rgb(20, 141, 64);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid rgb(22, 163, 74);
+        }
+        .badge-amber {
+            background-color: rgb(254, 252, 231);
+            color: rgb(180, 83, 9);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid rgb(217, 119, 6);
+        }
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .card {
+            border: 1px solid rgb(229, 231, 235);
+            border-radius: 0.5rem;
+            background: white;
+        }
+        .input-field {
+            border: 1px solid rgb(229, 231, 235);
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 1rem;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: rgb(22, 163, 74);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+        button[type="submit"]:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header class="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
+            <div class="flex items-center gap-6 md:gap-10">
+                <a href="#home" class="flex items-center space-x-2">
+                    <span class="text-xl font-bold text-green-600">Farmwise</span>
+                </a>
+                <nav class="hidden gap-6 md:flex">
+                    <a href="#products" class="text-sm font-medium transition-colors hover:text-green-600">Products</a>
+                    <a href="#about" class="text-sm font-medium transition-colors hover:text-green-600">About</a>
+                    <a href="#vendors" class="text-sm font-medium transition-colors hover:text-green-600">Vendors</a>
+                    <a href="#schedule" class="text-sm font-medium transition-colors hover:text-green-600">Schedule</a>
+                    <a href="#contact" class="text-sm font-medium transition-colors hover:text-green-600">Contact</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="#register">
+                    <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Sign Up</button>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1">
+        <!-- Hero Section -->
+        <section id="home" class="relative">
+            <div class="absolute inset-0 bg-black/40 z-10"></div>
+            <div class="h-[600px] bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1488459716781-6f0ee0b30bc9?q=80&w=1000&auto=format&fit=crop')"></div>
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 absolute inset-0 z-20 flex flex-col items-center justify-center text-center text-white">
+                <h1 class="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">Fresh From Our Farms <br /> To Your Table</h1>
+                <p class="mt-6 max-w-lg text-lg">Experience the freshest local produce, artisanal goods, and community spirit at Farmwise.</p>
+                <div class="mt-8 flex flex-wrap justify-center gap-4">
+                    <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md font-medium transition-colors">Find Our Location</button>
+                    <button class="border-2 border-white text-white hover:bg-white/10 px-6 py-3 rounded-md font-medium transition-colors">Sign Up Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Products -->
+        <section id="products" class="py-20 bg-green-50">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col items-center text-center mb-12">
+                    <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Seasonal Highlights</h2>
+                    <p class="mt-4 text-lg text-muted-foreground max-w-2xl">Discover what's fresh and in season at our market this week. All produce is locally grown and harvested at peak ripeness.</p>
+                </div>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4" id="products-grid">
+                    <!-- Products will be inserted here by JavaScript -->
+                </div>
+                <div class="mt-12 text-center">
+                    <button class="border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                        View All Products <i class="fas fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 gap-12 md:grid-cols-2 items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Our Story</h2>
+                        <p class="mt-4 text-lg text-muted-foreground">Our story began when we had the entrepreneurial mind and were given a chance to think about a business venture and realized the need for our farmers to have a helping hand pertaining to finding buyers of their product through a new type of middleman that's not expensive.</p>
+                        <p class="mt-4 text-lg text-muted-foreground">What started as a small initiative has grown into a vibrant marketplace connecting over 40 local Bukidnon farmers directly with consumers, eliminating costly intermediaries while ensuring farmers receive fair prices for their hard work.</p>
+                        <div class="mt-8 flex gap-4">
+                            <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Learn More</button>
+                            <button class="border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors">Our Values</button>
+                        </div>
+                    </div>
+                    <div class="relative h-[400px] rounded-lg overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1488459716781-6f0ee0b30bc9?q=80&w=600&auto=format&fit=crop')"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loyalty Program Section -->
+        <section class="py-20 bg-green-50">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col items-center text-center mb-12">
+                    <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Loyalty Rewards Program</h2>
+                    <p class="mt-4 text-lg text-muted-foreground max-w-2xl">Join our loyalty program and earn rewards every time you shop at Farmwise.</p>
+                </div>
+                <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+                    <div class="card p-6 text-center">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600 mx-auto">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3 class="mt-4 text-xl font-bold">Earn Points</h3>
+                        <p class="mt-2 text-muted-foreground">Earn 1 point for every ₱50 spent at our market. Points are automatically added to your account after each purchase.</p>
+                    </div>
+                    <div class="card p-6 text-center">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600 mx-auto">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <h3 class="mt-4 text-xl font-bold">Redeem Rewards</h3>
+                        <p class="mt-2 text-muted-foreground">Use your points to get discounts, free products, or exclusive offers. Redeem at checkout or through your account.</p>
+                    </div>
+                    <div class="card p-6 text-center">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600 mx-auto">
+                            <i class="fas fa-percent"></i>
+                        </div>
+                        <h3 class="mt-4 text-xl font-bold">Exclusive Benefits</h3>
+                        <p class="mt-2 text-muted-foreground">Enjoy member-only promotions, early access to seasonal products, and special event invitations as you move up tiers.</p>
+                    </div>
+                </div>
+                <div class="mt-12 text-center">
+                    <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md text-sm font-medium transition-colors">Join Now</button>
+                    <button class="border border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-md text-sm font-medium transition-colors ml-4">Learn More</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Vendors -->
+        <section id="vendors" class="py-20 bg-amber-50">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col items-center text-center mb-12">
+                    <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Meet Our Vendors</h2>
+                    <p class="mt-4 text-lg text-muted-foreground max-w-2xl">Our market is home to passionate local farmers, bakers, and artisans who bring their best products directly to you.</p>
+                </div>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" id="vendors-grid">
+                    <!-- Vendors will be inserted here by JavaScript -->
+                </div>
+                <div class="mt-12 text-center">
+                    <button class="border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                        View All Vendors <i class="fas fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Schedule & Location -->
+        <section id="schedule" class="py-20">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col items-center text-center mb-12">
+                    <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Visit Us</h2>
+                    <p class="mt-4 text-lg text-muted-foreground max-w-2xl">Join us at the CMU Farmers Market and experience the best local produce our community has to offer.</p>
+                </div>
+                <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+                    <div class="card overflow-hidden">
+                        <div class="h-[200px] bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1524634126167-d4674b1a5dda?q=80&w=600&auto=format&fit=crop')"></div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-4">Location</h3>
+                            <div class="flex items-start gap-3 mb-3">
+                                <i class="fas fa-map-pin text-green-600 mt-1"></i>
+                                <div>
+                                    <p class="font-medium">Central Mindanao University</p>
+                                    <p class="text-muted-foreground">Musuan Town, Maramag, Bukidnon, Philippines</p>
+                                </div>
+                            </div>
+                            <p class="mt-4 text-muted-foreground">Plenty of free parking available. Accessible by jeepneys and buses from Maramag and Valencia City.</p>
+                            <button class="mt-6 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Get Directions</button>
+                        </div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-2xl font-bold mb-4">Market Hours</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-calendar text-green-600 mt-1"></i>
+                                <div>
+                                    <p class="font-medium">Days of Operation</p>
+                                    <p class="text-muted-foreground">Every Saturday & Sunday, Year-round</p>
+                                    <p class="text-muted-foreground">Wednesday evenings (June - September)</p>
+                                </div>
+                            </div>
+                            <hr class="border-gray-300">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-clock text-green-600 mt-1"></i>
+                                <div>
+                                    <p class="font-medium">Hours</p>
+                                    <p class="text-muted-foreground">Saturday: 8:00 AM - 1:00 PM</p>
+                                    <p class="text-muted-foreground">Sunday: 9:00 AM - 2:00 PM</p>
+                                    <p class="text-muted-foreground">Wednesday: 4:00 PM - 8:00 PM (Summer only)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="mt-6 border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors">View Calendar</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact & Newsletter -->
+        <section id="contact" class="py-20 bg-green-50">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 gap-12 lg:grid-cols-2">
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Contact Us</h2>
+                        <p class="mt-4 text-lg text-muted-foreground">Have questions about the market? Want to become a vendor? We'd love to hear from you!</p>
+                        <div class="mt-8 space-y-4">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-phone text-green-600"></i>
+                                <p>(555) 123-4567</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-envelope text-green-600"></i>
+                                <p>info@cmufarmersmarket.com</p>
+                            </div>
+                        </div>
+                        <form id="contact-form" class="mt-6 space-y-4">
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div class="space-y-2">
+                                    <label for="name" class="block text-sm font-medium">Name</label>
+                                    <input type="text" id="name" placeholder="Your name" class="input-field w-full" required>
+                                </div>
+                                <div class="space-y-2">
+                                    <label for="email" class="block text-sm font-medium">Email</label>
+                                    <input type="email" id="email" placeholder="Your email" class="input-field w-full" required>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label for="subject" class="block text-sm font-medium">Subject</label>
+                                <input type="text" id="subject" placeholder="How can we help?" class="input-field w-full" required>
+                            </div>
+                            <div class="space-y-2">
+                                <label for="message" class="block text-sm font-medium">Message</label>
+                                <textarea id="message" placeholder="Your message" rows="4" class="input-field w-full" required></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Send Message</button>
+                        </form>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Stay Updated</h2>
+                        <p class="mt-4 text-lg text-muted-foreground">Subscribe to our newsletter to receive weekly updates on featured vendors, seasonal produce, and special events.</p>
+                        <form id="newsletter-form" class="mt-6">
+                            <div class="flex flex-col gap-2 sm:flex-row">
+                                <input type="email" id="newsletter-email" placeholder="Enter your email" class="input-field flex-1" required>
+                                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Subscribe</button>
+                            </div>
+                            <p class="mt-2 text-xs text-muted-foreground">By subscribing, you agree to receive marketing emails from us. You can unsubscribe at any time.</p>
+                        </form>
+                        <div class="mt-8 rounded-lg overflow-hidden">
+                            <div class="h-[300px] bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600&auto=format&fit=crop')"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t bg-gray-100">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+            <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
+                <div>
+                    <h3 class="text-lg font-semibold">Farmwise</h3>
+                    <p class="mt-2 text-sm text-muted-foreground">Bringing fresh, local produce to the Bukidnon community since 2010.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold">Quick Links</h3>
+                    <ul class="mt-2 space-y-2 text-sm">
+                        <li><a href="#products" class="text-muted-foreground hover:text-green-600">Products</a></li>
+                        <li><a href="#vendors" class="text-muted-foreground hover:text-green-600">Vendors</a></li>
+                        <li><a href="#schedule" class="text-muted-foreground hover:text-green-600">Schedule</a></li>
+                        <li><a href="#contact" class="text-muted-foreground hover:text-green-600">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold">Resources</h3>
+                    <ul class="mt-2 space-y-2 text-sm">
+                        <li><a href="#" class="text-muted-foreground hover:text-green-600">Vendor Application</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-green-600">Market Guidelines</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-green-600">Seasonal Calendar</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-green-600">Community Programs</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold">Follow Us</h3>
+                    <ul class="mt-2 space-y-2 text-sm">
+                        <li><a href="#" class="text-muted-foreground hover:text-green-600">Instagram</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-green-600">Facebook</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-green-600">Twitter</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-10 border-t border-gray-300 pt-6 text-center text-sm text-muted-foreground">
+                <p>© 2025 Farmwise. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Product data
+        const products = [
+            { id: "1", name: "Organic Strawberries", image: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=500&auto=format&fit=crop", price: "275/basket", vendor: "Sunshine Farms", isOrganic: true },
+            { id: "2", name: "Fresh Baked Bread", image: "https://images.unsplash.com/photo-1608198093002-ad4e005484ec?q=80&w=500&auto=format&fit=crop", price: "350/loaf", vendor: "Artisan Bakery", isOrganic: false },
+            { id: "3", name: "Local Honey", image: "https://images.unsplash.com/photo-1587049352851-8d4e89133924?q=80&w=500&auto=format&fit=crop", price: "650/jar", vendor: "Bee Happy Apiaries", isOrganic: true },
+            { id: "4", name: "Heirloom Tomatoes", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=500&auto=format&fit=crop", price: "300/kg", vendor: "Green Thumb Gardens", isOrganic: true },
+        ];
+
+        // Vendor data
+        const vendors = [
+            { name: "Sunshine Farms", image: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=500&auto=format&fit=crop", description: "Family-owned organic farm specializing in berries and stone fruits.", products: ["Strawberries", "Blueberries", "Peaches"] },
+            { name: "Artisan Bakery", image: "https://images.unsplash.com/photo-1608198093002-ad4e005484ec?q=80&w=500&auto=format&fit=crop", description: "Traditional sourdough breads and pastries baked fresh daily.", products: ["Sourdough", "Baguettes", "Croissants"] },
+            { name: "Green Thumb Gardens", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=500&auto=format&fit=crop", description: "Heirloom vegetables grown using sustainable farming practices.", products: ["Tomatoes", "Peppers", "Leafy Greens"] },
+        ];
+
+        // Render products
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = products.map(product => `
+                <div class="card overflow-hidden transition-all hover:shadow-md">
+                    <div class="relative aspect-square overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${product.image}')"></div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h3 class="font-medium">${product.name}</h3>
+                                <p class="text-sm text-muted-foreground">${product.vendor}</p>
+                            </div>
+                            ${product.isOrganic ? '<span class="badge-green">Organic</span>' : ''}
+                        </div>
+                        <p class="mt-2 font-medium text-green-600">₱${product.price}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render vendors
+        function renderVendors() {
+            const grid = document.getElementById('vendors-grid');
+            grid.innerHTML = vendors.map(vendor => `
+                <div class="card overflow-hidden transition-all hover:shadow-md">
+                    <div class="relative h-48 overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${vendor.image}')"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-xl font-bold text-white">${vendor.name}</h3>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-sm text-muted-foreground">${vendor.description}</p>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            ${vendor.products.map(p => `<span class="badge-amber">${p}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Show toast notification
+        function showToast(title, description) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<div><strong>${title}</strong><p>${description}</p></div>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Contact form handler
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = 'Sending...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                showToast('Message sent!', "We'll get back to you as soon as possible.");
+                this.reset();
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }, 1500);
+        });
+
+        // Newsletter form handler
+        document.getElementById('newsletter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = 'Subscribing...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                showToast('Subscribed!', "You've been added to our newsletter.");
+                this.reset();
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }, 1500);
+        });
+
+        // Initialize
+        renderProducts();
+        renderVendors();
+    </script>
+</body>
+</html>

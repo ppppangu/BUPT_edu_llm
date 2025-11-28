@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlphaSenti | 深度市场情绪终端</title>
+
+    <!-- 核心依赖 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Typography: IBM Plex Family -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['IBM Plex Sans', 'sans-serif'],
+                        serif: ['IBM Plex Serif', 'serif'],
+                        mono: ['IBM Plex Mono', 'monospace'],
+                    },
+                    colors: {
+                        ink: {
+                            900: '#121212',
+                            800: '#1c1c1c',
+                            500: '#666666',
+                            400: '#a1a1aa',
+                            100: '#f4f4f5',
+                        },
+                        paper: '#fafafa',
+                        accent: {
+                            bull: '#D9281E',
+                            bear: '#00873C',
+                            blue: '#2B5797',
+                            gold: '#B8860B',
+                        }
+                    },
+                    boxShadow: {
+                        'sharp': '4px 4px 0px 0px rgba(0,0,0,0.05)',
+                        'sharp-hover': '6px 6px 0px 0px rgba(0,0,0,0.08)',
+                    },
+                    animation: {
+                        'blink': 'blink 1s step-end infinite',
+                    },
+                    keyframes: {
+                        blink: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #121212;
+        }
+
+        .tech-panel {
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .tech-panel:hover {
+            border-color: #121212;
+            transform: translateY(-1px);
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.05);
+        }
+
+        .stagger-enter {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .stagger-wrapper > *:nth-child(1) { animation-delay: 0.05s; }
+        .stagger-wrapper > *:nth-child(2) { animation-delay: 0.1s; }
+        .stagger-wrapper > *:nth-child(3) { animation-delay: 0.15s; }
+        .stagger-wrapper > *:nth-child(4) { animation-delay: 0.2s; }
+        .stagger-wrapper > *:nth-child(5) { animation-delay: 0.25s; }
+        .stagger-wrapper > *:nth-child(6) { animation-delay: 0.3s; }
+        .stagger-wrapper > *:nth-child(7) { animation-delay: 0.35s; }
+        .stagger-wrapper > *:nth-child(8) { animation-delay: 0.4s; }
+
+        @keyframes slideUpFade {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+        .tag-badge {
+            font-family: 'IBM Plex Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.7rem;
+        }
+
+        .ai-cursor::after {
+            content: '▋';
+            color: #D9281E;
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+        }
+
+        [v-cloak] { display: none; }
+    </style>
+</head>
+<body class="antialiased">
+
+<div id="app" v-cloak class="min-h-screen flex flex-col max-w-[1600px] mx-auto border-x border-stone-200 bg-white relative shadow-lg">
+
+    <!-- 顶部导航 -->
+    <header class="h-20 flex items-center justify-between px-8 border-b border-stone-200 bg-white sticky top-0 z-50">
+        <div class="flex items-center gap-4 cursor-pointer group" @click="goHome">
+            <div class="flex flex-col leading-none">
+                <span class="font-serif font-bold text-2xl tracking-tight text-ink-900 group-hover:text-accent-blue transition-colors">AlphaSenti.</span>
+                <span class="font-mono text-[10px] text-ink-500 tracking-widest uppercase mt-1">Terminal v2.1.0 <span class="text-accent-bull">● AI ENHANCED</span></span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-8">
+            <div class="hidden md:flex items-center gap-3 px-4 py-2 bg-ink-100 rounded-sm border border-transparent hover:border-stone-300 transition-colors">
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-bear opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-accent-bear"></span>
+                    </span>
+                    <span class="font-mono text-xs font-medium text-ink-500">DATA STATUS</span>
+                </div>
+                <div class="h-3 w-px bg-stone-300"></div>
+                <span class="font-mono text-sm font-semibold text-accent-bear">{{ updateTime }}</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 页面内容 -->
+    <main class="flex-1 p-8 relative">
+
+        <!-- 加载状态 -->
+        <div v-if="loading" class="flex items-center justify-center py-20">
+            <div class="text-center">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-ink-900 mb-4"></div>
+                <p class="font-mono text-sm text-ink-500">LOADING DATA...</p>
+            </div>
+        </div>
+
+        <!-- 错误状态 -->
+        <div v-else-if="error" class="flex items-center justify-center py-20">
+            <div class="text-center">
+                <p class="font-mono text-sm text-accent-bull mb-4">{{ error }}</p>
+                <button @click="fetchHotStocks" class="px-4 py-2 bg-ink-900 text-white font-mono text-xs uppercase hover:bg-ink-800 transition-colors">
+                    RETRY
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. Landing Page -->
+        <div v-else-if="currentView === 'landing'" class="animate-fade-in space-y-8">
+            <div class="flex justify-between items-end border-b border-stone-200 pb-6">
+                <div>
+                    <h1 class="font-serif text-4xl text-ink-900 mb-2">Market Sentiment</h1>
+                    <p class="font-sans text-ink-500 text-sm max-w-xl">Real-time aggregation of retail investor sentiment across fragmented data sources. AI-Powered Analysis.</p>
+                </div>
+                <div class="font-mono text-xs text-ink-500 text-right">
+                    <div class="mb-1">DATA DELAY: <span class="text-accent-bear">Live</span></div>
+                    <div>SOURCES: <span class="text-ink-900">AKSHARE, CAIXIN, DEEPSEEK</span></div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-stone-200 shadow-sharp">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-ink-900">
+                            <th class="p-5 font-mono text-xs text-ink-500 tracking-widest uppercase">Rank</th>
+                            <th class="p-5 font-mono text-xs text-ink-500 tracking-widest uppercase">Ticker</th>
+                            <th class="p-5 font-mono text-xs text-ink-500 tracking-widest uppercase">Company</th>
+                            <th class="p-5 font-mono text-xs text-ink-500 tracking-widest uppercase text-right">Price</th>
+                            <th class="p-5 font-mono text-xs text-ink-500 tracking-widest uppercase text-right">Change</th>
+                            <th class="p-5 font-mono text-xs text-ink-500 tracking-widest uppercase text-right">Sentiment</th>
+                            <th class="p-5 font-mono text-xs text-ink-500 tracking-widest uppercase">Narrative</th>
+                            <th class="p-5"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="stagger-wrapper">
+                        <tr v-for="(stock, index) in hotStocks" :key="stock.code"
+                            @click="viewStock(stock)"
+                            class="stagger-enter group border-b border-stone-100 hover:bg-stone-50 cursor-pointer transition-colors">
+                            <td class="p-5 font-serif text-lg italic text-ink-400 w-16">{{ stock.heat }}</td>
+                            <td class="p-5 font-mono text-sm text-accent-blue font-medium group-hover:underline">{{ stock.code }}</td>
+                            <td class="p-5 font-sans font-semibold text-ink-900 text-lg">{{ stock.name }}</td>
+                            <td class="p-5 text-right font-mono text-ink-900">{{ formatPrice(stock.price) }}</td>
+                            <td class="p-5 text-right font-mono font-medium" :class="stock.change >= 0 ? 'text-accent-bull' : 'text-accent-bear'">
+                                {{ stock.change >= 0 ? '+' : ''}}{{ stock.change?.toFixed(2) }}%
+                            </td>
+                            <td class="p-5 text-right">
+                                <span v-if="stock.sentiment_score !== null"
+                                      class="font-mono text-sm font-bold px-2 py-1 border"
+                                      :class="getSentimentColorClass(stock.sentiment_score)">
+                                    {{ stock.sentiment_score }}
+                                </span>
+                                <span v-else class="font-mono text-xs text-ink-400">--</span>
+                            </td>
+                            <td class="p-5">
+                                <div class="flex flex-wrap gap-2">
+                                    <span v-for="tag in stock.tags?.slice(0, 3)" class="tag-badge px-2 py-1 border border-stone-200 bg-white text-ink-500 rounded-sm">
+                                        {{ tag }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="p-5 text-right">
+                                <i class="ph ph-caret-right text-ink-400 group-hover:text-ink-900 transition-colors"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2. Detail Page -->
+        <div v-else-if="activeStock" class="animate-fade-in">
+
+            <!-- 详情页加载 -->
+            <div v-if="detailLoading" class="flex items-center justify-center py-20">
+                <div class="text-center">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-ink-900 mb-4"></div>
+                    <p class="font-mono text-sm text-ink-500">LOADING STOCK DETAIL...</p>
+                </div>
+            </div>
+
+            <template v-else>
+                <!-- 详情页头部 -->
+                <div class="flex items-start justify-between mb-8 border-b border-stone-200 pb-6 stagger-enter">
+                    <div>
+                        <button @click="goHome" class="group flex items-center gap-2 text-ink-500 hover:text-ink-900 transition-colors mb-4">
+                            <i class="ph ph-arrow-left"></i>
+                            <span class="font-mono text-xs uppercase tracking-widest group-hover:underline">Back to Screener</span>
+                        </button>
+                        <h1 class="font-serif text-5xl text-ink-900 mb-2 tracking-tight">{{ activeStock.name }}</h1>
+                        <div class="flex items-center gap-4 font-mono text-sm">
+                            <span class="bg-ink-900 text-white px-2 py-0.5">{{ activeStock.code }}</span>
+                            <span class="text-ink-500">{{ activeStock.code?.startsWith('SH') ? 'SSE' : 'SZSE' }}</span>
+                            <span class="text-xs text-accent-blue border border-accent-blue px-1 rounded-sm">DATA: AKSHARE</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-mono text-4xl font-medium tracking-tighter text-ink-900 mb-1">{{ formatPrice(activeStock.price) }}</div>
+                        <div class="font-mono text-sm font-bold px-3 py-1 inline-block border"
+                             :class="activeStock.change >= 0 ? 'border-accent-bull text-accent-bull bg-red-50' : 'border-accent-bear text-accent-bear bg-green-50'">
+                            {{ activeStock.change >= 0 ? '▲' : '▼' }} {{ Math.abs(activeStock.change)?.toFixed(2) }}%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-8 stagger-wrapper">
+
+                    <!-- 左侧：主内容 (8列) -->
+                    <div class="col-span-12 lg:col-span-8 space-y-8 stagger-enter">
+
+                        <!-- K线图表容器 -->
+                        <div class="tech-panel p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="font-mono text-xs uppercase tracking-widest text-ink-500">Daily K-Line Chart (Unit: CNY)</h3>
+                                <span class="font-mono text-xs text-ink-400">DAILY</span>
+                            </div>
+                            <div id="klineChart" class="h-[400px] w-full"></div>
+                        </div>
+
+                        <!-- AI 情绪分析模块 -->
+                        <div class="tech-panel border-l-4 border-l-accent-bull p-6 bg-stone-50">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-mono text-sm font-bold uppercase tracking-widest text-ink-900 flex items-center gap-2">
+                                    <i class="ph-fill ph-sparkle text-accent-bull"></i> AI 情绪综述
+                                </h3>
+                                <span class="font-mono text-xs text-ink-400">MODEL: DeepSeek</span>
+                            </div>
+
+                            <!-- AI 生成的内容区域 -->
+                            <div class="font-serif text-ink-900 leading-relaxed">
+                                <p class="mb-4" v-if="stockDetail?.analysis">
+                                    <strong class="text-ink-500 font-mono text-xs uppercase">Summary //</strong>
+                                    {{ stockDetail.analysis }}
+                                </p>
+                                <p class="mb-4" v-else>
+                                    <strong class="text-ink-500 font-mono text-xs uppercase">Summary //</strong>
+                                    基于实时数据分析，<span class="bg-yellow-100 px-1">{{ activeStock.name }}</span> 当前情绪评分为
+                                    <strong>{{ activeStock.sentiment_score ?? '--' }}</strong>，
+                                    {{ getSentimentDescription(activeStock.sentiment_score) }}。
+                                </p>
+                                <p v-if="stockDetail?.keywords?.length" class="mb-4">
+                                    <strong class="text-ink-500 font-mono text-xs uppercase">关键词 //</strong>
+                                    {{ stockDetail.keywords.map(k => k.word).join('、') }}
+                                </p>
+                                <p>
+                                    <strong class="text-ink-500 font-mono text-xs uppercase">Price //</strong>
+                                    当前价格 <strong>{{ formatPrice(activeStock.price) }}</strong>，
+                                    涨跌幅 <strong :class="activeStock.change >= 0 ? 'text-accent-bull' : 'text-accent-bear'">
+                                        {{ activeStock.change >= 0 ? '+' : '' }}{{ activeStock.change?.toFixed(2) }}%
+                                    </strong>
+                                </p>
+                            </div>
+
+                            <div class="mt-4 pt-4 border-t border-stone-200 flex gap-4">
+                                <div class="text-xs font-mono text-ink-500">
+                                    SCORE: <span class="text-ink-900 font-bold">{{ activeStock.sentiment_score ?? '--' }}/100</span>
+                                </div>
+                                <div class="text-xs font-mono text-ink-500">
+                                    TONE: <span :class="getSentimentColorClass(activeStock.sentiment_score)" class="font-bold">
+                                        {{ getSentimentLabel(activeStock.sentiment_score) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 新闻/公告流 -->
+                        <div class="tech-panel p-0 overflow-hidden">
+                            <div class="p-4 border-b border-stone-200 bg-white flex justify-between items-center">
+                                <h3 class="font-mono text-xs uppercase tracking-widest text-ink-500">News Feed</h3>
+                                <span class="font-mono text-xs text-ink-400">{{ stockDetail?.news?.length || 0 }} articles</span>
+                            </div>
+                            <div class="divide-y divide-stone-100 max-h-96 overflow-y-auto scrollbar-hide">
+                                <a v-for="(news, i) in stockDetail?.news || []" :key="i"
+                                   :href="news.url || '#'" target="_blank" rel="noopener noreferrer"
+                                   class="block p-5 hover:bg-stone-50 transition-colors group cursor-pointer">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="tag-badge text-[10px] px-1.5 py-0.5 border border-accent-blue text-accent-blue bg-blue-50">
+                                            {{ news.source }}
+                                        </span>
+                                        <span class="font-mono text-xs text-ink-400">{{ formatNewsTime(news.publish_time) }}</span>
+                                    </div>
+                                    <h4 class="font-serif text-lg text-ink-900 mb-1 group-hover:text-accent-blue transition-colors">{{ news.title }}</h4>
+                                    <p v-if="news.content" class="text-sm text-ink-500 line-clamp-2">{{ news.content }}</p>
+                                </a>
+                                <div v-if="!stockDetail?.news?.length" class="p-8 text-center text-ink-400 font-mono text-sm">
+                                    暂无相关新闻
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：指标 (4列) -->
+                    <div class="col-span-12 lg:col-span-4 space-y-8 stagger-enter">
+
+                        <!-- 核心情绪仪表 -->
+                        <div class="tech-panel p-6 relative overflow-hidden bg-ink-900 text-white">
+                            <div class="absolute top-0 right-0 p-6 opacity-10">
+                                <i class="ph-fill ph-fingerprint text-9xl"></i>
+                            </div>
+                            <h3 class="font-mono text-xs uppercase tracking-widest text-stone-400 mb-4">Alpha Score</h3>
+                            <div class="flex items-baseline gap-4 mb-6 relative z-10">
+                                <span class="font-mono text-6xl font-bold tracking-tighter">{{ activeStock.sentiment_score ?? '--' }}</span>
+                                <span class="font-mono text-xs px-2 py-1 border border-stone-600 text-stone-300 uppercase">
+                                    {{ getSentimentLabel(activeStock.sentiment_score) }}
+                                </span>
+                            </div>
+                            <div class="w-full bg-stone-800 h-px mb-4">
+                                <div class="h-0.5 bg-accent-bull transition-all duration-1000 ease-out"
+                                     :style="`width: ${activeStock.sentiment_score || 0}%`"></div>
+                            </div>
+                            <p class="font-sans text-xs text-stone-400 leading-relaxed max-w-[80%]">
+                                Real-time sentiment analysis based on news and social media.
+                            </p>
+                        </div>
+
+                        <!-- 三个热点指数 -->
+                        <div class="tech-panel p-6" v-if="stockDetail?.rating">
+                            <h3 class="font-mono text-xs uppercase tracking-widest text-ink-500 mb-4">Market Rating</h3>
+                            <div class="space-y-4">
+                                <!-- 综合得分 -->
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-ink-500">综合得分</span>
+                                    <div class="flex items-center gap-2">
+                                        <div class="h-1.5 w-20 bg-stone-200 rounded-full overflow-hidden">
+                                            <div class="h-full bg-accent-blue transition-all"
+                                                 :style="`width: ${stockDetail.rating.score || 0}%`"></div>
+                                        </div>
+                                        <span class="font-mono text-sm font-bold text-ink-900">
+                                            {{ stockDetail.rating.score?.toFixed(1) || '--' }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- 机构参与度 -->
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-ink-500">机构参与度</span>
+                                    <div class="flex items-center gap-2">
+                                        <div class="h-1.5 w-20 bg-stone-200 rounded-full overflow-hidden">
+                                            <div class="h-full bg-accent-bull transition-all"
+                                                 :style="`width: ${(stockDetail.rating.institution_ratio || 0) * 100}%`"></div>
+                                        </div>
+                                        <span class="font-mono text-sm font-bold text-ink-900">
+                                            {{ ((stockDetail.rating.institution_ratio || 0) * 100).toFixed(1) }}%
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- 关注指数 -->
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-ink-500">关注指数</span>
+                                    <div class="flex items-center gap-2">
+                                        <div class="h-1.5 w-20 bg-stone-200 rounded-full overflow-hidden">
+                                            <div class="h-full bg-accent-gold transition-all"
+                                                 :style="`width: ${stockDetail.rating.attention_index || 0}%`"></div>
+                                        </div>
+                                        <span class="font-mono text-sm font-bold text-ink-900">
+                                            {{ stockDetail.rating.attention_index?.toFixed(1) || '--' }}%
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 其他指标 -->
+                            <div class="grid grid-cols-2 gap-3 pt-4 mt-4 border-t border-stone-100 text-xs">
+                                <div>
+                                    <span class="text-ink-400">主力成本</span>
+                                    <span class="font-mono text-ink-900 ml-1">{{ stockDetail.rating.main_cost?.toFixed(2) || '--' }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-ink-400">市盈率</span>
+                                    <span class="font-mono text-ink-900 ml-1">{{ stockDetail.rating.pe_ratio?.toFixed(2) || '--' }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-ink-400">换手率</span>
+                                    <span class="font-mono text-ink-900 ml-1">{{ stockDetail.rating.turnover_rate?.toFixed(2) || '--' }}%</span>
+                                </div>
+                                <div>
+                                    <span class="text-ink-400">排名</span>
+                                    <span class="font-mono text-ink-900 ml-1">{{ stockDetail.rating.rank || '--' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 关键词标签 -->
+                        <div class="tech-panel p-6" v-if="stockDetail?.keywords?.length || activeStock.tags?.length">
+                            <h3 class="font-mono text-xs uppercase tracking-widest text-ink-500 mb-4">Key Drivers</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <span v-for="kw in stockDetail?.keywords || []"
+                                      class="px-3 py-2 border text-sm font-sans transition-all hover:shadow-sharp cursor-default"
+                                      :class="getKeywordClass(kw.sentiment)">
+                                    {{ kw.word }}
+                                </span>
+                                <span v-for="tag in activeStock.tags || []"
+                                      v-if="!stockDetail?.keywords?.length"
+                                      class="px-3 py-2 border border-stone-200 text-ink-500 text-sm font-sans">
+                                    {{ tag }}
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </template>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-stone-200 px-8 py-4 bg-white">
+        <div class="flex justify-between items-center text-xs font-mono text-ink-400">
+            <span>AlphaSenti Terminal v2.1.0</span>
+            <span>Data updated: {{ updateTime }}</span>
+        </div>
+    </footer>
+
+</div>
+
+<script>
+    const { createApp, ref, onMounted, nextTick } = Vue;
+
+    createApp({
+        setup() {
+            const currentView = ref('landing');
+            const loading = ref(true);
+            const detailLoading = ref(false);
+            const error = ref(null);
+            const hotStocks = ref([]);
+            const activeStock = ref(null);
+            const stockDetail = ref(null);
+            const updateTime = ref('--');
+            let kChart = null;
+
+            // 获取热门股票列表（从 API 获取）
+            const fetchHotStocks = async () => {
+                loading.value = true;
+                error.value = null;
+                try {
+                    const response = await fetch('/api/hot_stocks');
+                    if (!response.ok) throw new Error('Failed to fetch data');
+                    const data = await response.json();
+                    hotStocks.value = data.stocks || [];
+                    updateTime.value = formatUpdateTime(data.updated_at);
+                } catch (e) {
+                    console.error('Failed to fetch hot stocks:', e);
+                    error.value = 'Failed to load data. Please try again.';
+                } finally {
+                    loading.value = false;
+                }
+            };
+
+            // 获取股票详情（从 API 获取）
+            const fetchStockDetail = async (code) => {
+                detailLoading.value = true;
+                try {
+                    const response = await fetch(`/api/stock/${code}`);
+                    if (!response.ok) {
+                        stockDetail.value = null;
+                        return;
+                    }
+                    const data = await response.json();
+                    stockDetail.value = data.detail || data;
+                } catch (e) {
+                    console.error('Failed to fetch stock detail:', e);
+                    stockDetail.value = null;
+                } finally {
+                    detailLoading.value = false;
+                }
+            };
+
+            // 查看股票详情
+            const viewStock = async (stock) => {
+                activeStock.value = stock;
+                currentView.value = 'detail';
+                await fetchStockDetail(stock.code);
+                await nextTick();
+                initKlineChart();
+            };
+
+            // 返回首页
+            const goHome = () => {
+                currentView.value = 'landing';
+                activeStock.value = null;
+                stockDetail.value = null;
+                if (kChart) {
+                    kChart.dispose();
+                    kChart = null;
+                }
+            };
+
+            // 初始化K线图
+            const initKlineChart = () => {
+                const chartDom = document.getElementById('klineChart');
+                if (!chartDom) return;
+
+                if (kChart) {
+                    kChart.dispose();
+                }
+                kChart = echarts.init(chartDom);
+
+                const fontFamily = '"IBM Plex Mono", monospace';
+                const klineData = stockDetail.value?.kline || [];
+
+                if (klineData.length === 0) {
+                    kChart.setOption({
+                        title: {
+                            text: 'No K-line data available',
+                            left: 'center',
+                            top: 'center',
+                            textStyle: { color: '#666', fontSize: 14, fontFamily }
+                        }
+                    });
+                    return;
+                }
+
+                // 准备数据
+                const dates = klineData.map(d => d.date);
+                const values = klineData.map(d => [d.open, d.close, d.low, d.high]);
+
+                kChart.setOption({
+                    animation: true,
+                    grid: {
+                        left: 60,
+                        right: 20,
+                        top: 20,
+                        bottom: 60,
+                        containLabel: false
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: { type: 'cross', label: { backgroundColor: '#121212', fontFamily } },
+                        backgroundColor: '#ffffff',
+                        borderColor: '#121212',
+                        borderWidth: 1,
+                        textStyle: { color: '#121212', fontFamily },
+                        padding: [10, 10],
+                        formatter: function(params) {
+                            const data = params[0];
+                            if (!data) return '';
+                            const [open, close, low, high] = data.data;
+                            return `<div style="font-family: ${fontFamily}">
+                                <div style="font-weight: bold; margin-bottom: 4px">${data.axisValue}</div>
+                                <div>开盘: ${open} 元</div>
+                                <div>收盘: ${close} 元</div>
+                                <div>最低: ${low} 元</div>
+                                <div>最高: ${high} 元</div>
+                            </div>`;
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: dates,
+                        axisLine: { show: true, lineStyle: { color: '#e5e5e5' } },
+                        axisLabel: {
+                            color: '#666',
+                            fontFamily,
+                            fontSize: 10,
+                            rotate: 45,
+                            formatter: (value) => value.slice(5) // 只显示月-日
+                        },
+                        axisTick: { show: false }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        scale: true,
+                        splitLine: { show: true, lineStyle: { color: '#f4f4f5', type: 'dashed' } },
+                        axisLabel: {
+                            color: '#666',
+                            fontFamily,
+                            fontSize: 10,
+                            formatter: '{value}'
+                        }
+                    },
+                    dataZoom: [
+                        {
+                            type: 'inside',
+                            start: 0,
+                            end: 100
+                        }
+                    ],
+                    series: [{
+                        type: 'candlestick',
+                        data: values,
+                        itemStyle: {
+                            color: '#D9281E',      // 上涨填充色
+                            color0: '#00873C',     // 下跌填充色
+                            borderColor: '#D9281E', // 上涨边框色
+                            borderColor0: '#00873C' // 下跌边框色
+                        },
+                        barWidth: '60%'
+                    }]
+                });
+
+                window.addEventListener('resize', () => {
+                    kChart?.resize();
+                });
+            };
+
+            // 工具函数
+            const formatPrice = (price) => {
+                if (price == null) return '--';
+                return Number(price).toFixed(2);
+            };
+
+            const formatUpdateTime = (timeStr) => {
+                if (!timeStr) return '--';
+                try {
+                    const date = new Date(timeStr);
+                    return date.toLocaleString('zh-CN', {
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                } catch {
+                    return timeStr;
+                }
+            };
+
+            const formatNewsTime = (timeStr) => {
+                if (!timeStr) return '--';
+                try {
+                    const date = new Date(timeStr);
+                    return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                } catch {
+                    return timeStr.slice(0, 10);
+                }
+            };
+
+            const getSentimentColorClass = (score) => {
+                if (score == null) return 'text-ink-400';
+                if (score >= 60) return 'border-accent-bull text-accent-bull bg-red-50';
+                if (score <= 40) return 'border-accent-bear text-accent-bear bg-green-50';
+                return 'border-stone-300 text-ink-500 bg-stone-50';
+            };
+
+            const getSentimentLabel = (score) => {
+                if (score == null) return 'N/A';
+                if (score >= 60) return 'BULLISH';
+                if (score <= 40) return 'BEARISH';
+                return 'NEUTRAL';
+            };
+
+            const getSentimentDescription = (score) => {
+                if (score == null) return '暂无情绪分析数据';
+                if (score >= 60) return '市场情绪偏向看涨';
+                if (score <= 40) return '市场情绪偏向看跌';
+                return '市场情绪中性';
+            };
+
+            const getKeywordClass = (sentiment) => {
+                if (sentiment === 'positive') return 'border-accent-bull/20 bg-red-50/30 text-accent-bull';
+                if (sentiment === 'negative') return 'border-accent-bear/20 bg-green-50/30 text-accent-bear';
+                return 'border-stone-200 text-ink-500';
+            };
+
+            // 初始化
+            onMounted(() => {
+                fetchHotStocks();
+            });
+
+            return {
+                currentView,
+                loading,
+                detailLoading,
+                error,
+                hotStocks,
+                activeStock,
+                stockDetail,
+                updateTime,
+                fetchHotStocks,
+                viewStock,
+                goHome,
+                formatPrice,
+                formatNewsTime,
+                getSentimentColorClass,
+                getSentimentLabel,
+                getSentimentDescription,
+                getKeywordClass
+            };
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>
