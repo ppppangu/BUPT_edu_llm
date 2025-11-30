@@ -57,8 +57,7 @@ class NewsService:
             return None
 
     def initialize_data(self):
-        """初始化数据"""
-        print("Initializing news data...")
+        """初始化数据（从文件加载）"""
 
         if self._load_news_from_file():
             self.last_update_time = datetime.now()

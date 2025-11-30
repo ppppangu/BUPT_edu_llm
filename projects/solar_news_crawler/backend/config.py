@@ -2,9 +2,13 @@
 """配置管理模块"""
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # 项目根目录
 PROJECT_ROOT = Path(__file__).parent.parent
+
+# 加载 .env 文件（系统环境变量优先，.env 作为备用）
+load_dotenv(PROJECT_ROOT / ".env")
 DATA_DIR = PROJECT_ROOT / "data"
 CRAWLERS_DIR = PROJECT_ROOT / "crawlers"
 FRONTEND_DIR = PROJECT_ROOT / "frontend"

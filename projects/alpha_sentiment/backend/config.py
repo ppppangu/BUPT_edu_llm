@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).parent
 PROJECT_DIR = BASE_DIR.parent
 
-# 加载 .env 文件（override=True 确保覆盖系统环境变量）
-load_dotenv(PROJECT_DIR / ".env", override=True)
+# 加载 .env 文件（系统环境变量优先，.env 作为备用）
+load_dotenv(PROJECT_DIR / ".env")
 
 # 静态数据输出目录（与 backend、frontend 同级）
 DATA_DIR = PROJECT_DIR / "data"

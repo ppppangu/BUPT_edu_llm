@@ -95,6 +95,7 @@ def generate_static_data():
 
 # 全局调度器实例
 scheduler = BackgroundScheduler()
+_scheduler_started = False
 
 
 def check_data_needs_refresh() -> bool:
@@ -127,9 +128,12 @@ def check_data_needs_refresh() -> bool:
 
 def start_scheduler():
     """启动调度器"""
-    if scheduler.running:
-        print("调度器已在运行")
+    global _scheduler_started
+
+    if _scheduler_started or scheduler.running:
         return
+
+    _scheduler_started = True
 
     # 添加每日任务
     scheduler.add_job(

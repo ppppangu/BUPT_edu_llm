@@ -133,8 +133,8 @@ def legacy_get_ai_summary(news_type):
 
 def create_app():
     """创建应用实例（供 gunicorn 使用）"""
-    # 启动后台调度器
-    start_scheduler()
+    # 启动后台调度器（如果没有数据则立即抓取）
+    start_scheduler(run_immediately=True)
     return app
 
 

@@ -1,0 +1,17 @@
+{
+  "crawl_time": "2025-11-30 04:44:12",
+  "total_load_rounds": 1,
+  "total_news": 1,
+  "news_list": [
+    {
+      "title": "IRENA Report: Solar Energy Leads Global Renewable Growth",
+      "link": "https://www.irena.org/news/articles/2024/solar-energy-growth",
+      "date": "2024-09-15",
+      "summary": "New report shows solar energy continuing to lead global renewable energy capacity growth.",
+      "source": "IRENA",
+      "language": "en",
+      "search_keyword": "solar energy",
+      "load_round": 1
+    }
+  ]
+}

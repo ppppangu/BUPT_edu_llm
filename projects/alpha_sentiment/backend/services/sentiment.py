@@ -24,6 +24,7 @@ class SentimentAnalyzer:
                 api_key=LLM_API_KEY,
                 base_url=LLM_BASE_URL
             )
+        self.model = LLM_MODEL
 
     def _extract_json(self, text: str) -> str:
         """Strip markdown fences and whitespace to keep pure JSON."""
@@ -165,7 +166,7 @@ class SentimentAnalyzer:
 
         try:
             response = self.client.chat.completions.create(
-                model=LLM_MODEL,
+                model=self.model,
                 messages=[
                     {"role": "system", "content": "你是一位专业的股票分析师，擅长从新闻中分析市场情绪。请以 JSON 格式返回分析结果。"},
                     {"role": "user", "content": prompt}
