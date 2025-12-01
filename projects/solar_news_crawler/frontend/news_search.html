@@ -730,8 +730,9 @@
                 const response = await fetch('./api/summary/domestic');
                 const result = await response.json();
 
-                if (result.success && result.data) {
-                    const data = result.data;
+                // data 是数组，取第一个元素（最新的总结）
+                if (result.success && result.data && result.data.length > 0) {
+                    const data = result.data[0];
                     const contentDiv = document.getElementById('aiSummaryContent');
 
                     let summaryHtml = '';

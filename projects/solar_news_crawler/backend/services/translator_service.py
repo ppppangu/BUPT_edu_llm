@@ -11,7 +11,10 @@ from typing import Dict, List, Optional
 
 import requests
 
-from backend.config import DATA_DIR
+from backend.config import DATA_DIR, CRAWLERS_DIR
+
+# 国际新闻爬虫的输出目录
+CRAWLERS_OUTPUT_DIR = CRAWLERS_DIR / "output"
 
 
 def find_latest_file(pattern: str, directory: Path = None) -> Optional[str]:
@@ -28,6 +31,26 @@ def find_latest_file(pattern: str, directory: Path = None) -> Optional[str]:
 
     files.sort(key=os.path.getmtime, reverse=True)
     return files[0]
+
+
+def find_latest_crawler_file(pattern: str) -> Optional[str]:
+    """查找爬虫输出目录中的最新文件，支持子目录"""
+    all_files = []
+
+    # 在 crawlers/output/ 目录搜索
+    if CRAWLERS_OUTPUT_DIR.exists():
+        all_files.extend(glob.glob(str(CRAWLERS_OUTPUT_DIR / pattern)))
+        all_files.extend(glob.glob(str(CRAWLERS_OUTPUT_DIR / "**" / pattern), recursive=True))
+
+    # 在 crawlers/ 目录搜索
+    if CRAWLERS_DIR.exists():
+        all_files.extend(glob.glob(str(CRAWLERS_DIR / pattern)))
+
+    if not all_files:
+        return None
+
+    all_files.sort(key=os.path.getmtime, reverse=True)
+    return all_files[0]
 
 
 class TranslatorService:
@@ -232,19 +255,20 @@ class TranslatorService:
         """合并所有翻译结果并保存"""
         all_news = []
 
+        # 使用 find_latest_crawler_file 从爬虫输出目录查找文件
         files_to_process = [
             {
-                'filename': find_latest_file('pvmagazine_*.json'),
+                'filename': find_latest_crawler_file('pv_magazine_*.json'),
                 'processor': self.process_pv_magazine_file,
                 'source': 'PV Magazine'
             },
             {
-                'filename': find_latest_file('irena_*.json'),
+                'filename': find_latest_crawler_file('irena_*.json'),
                 'processor': self.process_irena_file,
                 'source': 'IRENA'
             },
             {
-                'filename': find_latest_file('iea_*.json'),
+                'filename': find_latest_crawler_file('IEA_*.json'),
                 'processor': self.process_iea_file,
                 'source': 'IEA'
             }
