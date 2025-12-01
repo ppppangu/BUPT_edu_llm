@@ -20,11 +20,27 @@ class PVMagazineSeleniumCrawler:
     def __init__(self):
         self.base_url = "https://www.pv-magazine.com"
         self.content_data = []
-        
-        # 设置Chrome选项
+
+        # 设置 NO_PROXY 以避免代理干扰 chromedriver 与浏览器的通信
+        os.environ['NO_PROXY'] = 'localhost,127.0.0.1'
+        os.environ['no_proxy'] = 'localhost,127.0.0.1'
+
+        # 设置Chrome/Chromium选项
         chrome_options = Options()
         chrome_options.add_argument('--headless=new')  # 新版无头模式
         chrome_options.add_argument('--disable-gpu')
+
+        # 指定 Chromium 浏览器路径（适配Linux环境）
+        chromium_paths = [
+            '/usr/bin/chromium',
+            '/usr/bin/chromium-browser',
+            '/usr/bin/google-chrome',
+            '/usr/bin/google-chrome-stable'
+        ]
+        for path in chromium_paths:
+            if os.path.exists(path):
+                chrome_options.binary_location = path
+                break
 
         # 创建唯一的用户数据目录，避免多实例冲突
         unique_dir = os.path.join(tempfile.gettempdir(), f"chrome_pvmag_{uuid.uuid4().hex}")
@@ -39,10 +55,23 @@ class PVMagazineSeleniumCrawler:
         chrome_options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
 
         # 使用系统的ChromeDriver（适配Linux环境）
+        chromedriver_paths = [
+            '/usr/bin/chromedriver',
+            '/usr/local/bin/chromedriver'
+        ]
+        service = None
+        for path in chromedriver_paths:
+            if os.path.exists(path):
+                service = Service(executable_path=path)
+                break
+
         try:
-            # 尝试使用系统chromedriver
-            self.driver = webdriver.Chrome(options=chrome_options)
-        except:
+            if service:
+                self.driver = webdriver.Chrome(service=service, options=chrome_options)
+            else:
+                self.driver = webdriver.Chrome(options=chrome_options)
+        except Exception as e:
+            print(f"直接启动失败: {e}")
             # 如果失败，尝试使用webdriver-manager
             service = Service(ChromeDriverManager().install())
             self.driver = webdriver.Chrome(service=service, options=chrome_options)

@@ -8,6 +8,11 @@ import tempfile
 import uuid
 from datetime import datetime, timedelta
 from urllib.parse import quote, urljoin
+from pathlib import Path
+
+# 数据输出目录
+DATA_DIR = Path(__file__).parent.parent / "data"
+DATA_DIR.mkdir(exist_ok=True)
 
 try:
     from selenium import webdriver
@@ -23,6 +28,10 @@ try:
             self.gov_search_url = "https://sousuo.www.gov.cn/sousuo/search.shtml"
             self.nea_search_url = "https://www.nea.gov.cn/search.htm"
             self.driver = None
+
+            # 设置 NO_PROXY 以避免代理干扰 chromedriver 与浏览器的通信
+            os.environ['NO_PROXY'] = 'localhost,127.0.0.1'
+            os.environ['no_proxy'] = 'localhost,127.0.0.1'
             
         def setup_driver(self):
             """设置浏览器环境"""
@@ -32,14 +41,22 @@ try:
             chrome_options.add_argument('--headless=new')
             chrome_options.add_argument('--disable-gpu')
 
+            # 指定 Chromium 浏览器路径（适配Linux环境）
+            chromium_paths = [
+                '/usr/bin/chromium',
+                '/usr/bin/chromium-browser',
+                '/usr/bin/google-chrome',
+                '/usr/bin/google-chrome-stable'
+            ]
+            for path in chromium_paths:
+                if os.path.exists(path):
+                    chrome_options.binary_location = path
+                    break
+
             # 反检测配置
             chrome_options.add_argument('--disable-blink-features=AutomationControlled')
             chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
             chrome_options.add_experimental_option('useAutomationExtension', False)
-
-            # 不使用user-data-dir，让Chrome自动处理（避免冲突）
-            # unique_dir = os.path.join(tempfile.gettempdir(), f"chrome_combined_{uuid.uuid4().hex}")
-            # chrome_options.add_argument(f'--user-data-dir={unique_dir}')
 
             # 添加更多隔离参数
             chrome_options.add_argument('--no-sandbox')
@@ -47,9 +64,24 @@ try:
             chrome_options.add_argument(f'--remote-debugging-port={9222 + random.randint(0, 1000)}')
             chrome_options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
             chrome_options.add_argument('--window-size=1920,1080')
-            
+
             try:
-                self.driver = webdriver.Chrome(options=chrome_options)
+                # 尝试使用系统chromedriver
+                from selenium.webdriver.chrome.service import Service
+                chromedriver_paths = [
+                    '/usr/bin/chromedriver',
+                    '/usr/local/bin/chromedriver'
+                ]
+                service = None
+                for path in chromedriver_paths:
+                    if os.path.exists(path):
+                        service = Service(executable_path=path)
+                        break
+
+                if service:
+                    self.driver = webdriver.Chrome(service=service, options=chrome_options)
+                else:
+                    self.driver = webdriver.Chrome(options=chrome_options)
                 self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
                 return True
             except Exception as e:
@@ -403,20 +435,27 @@ try:
             
             return datetime.now().strftime('%Y-%m-%d')
         
-        def process_and_save_news(self, news_list, filename='combined_news.json'):
+        def process_and_save_news(self, news_list, filename=None):
             """处理并保存新闻数据"""
             seen_titles = set()
             unique_news = []
-            
+
             for news in news_list:
                 clean_title = re.sub(r'\s+', ' ', news['title']).strip()
                 if clean_title and clean_title not in seen_titles:
                     seen_titles.add(clean_title)
                     unique_news.append(news)
-            
+
             # 按日期排序
             unique_news.sort(key=lambda x: x['date'], reverse=True)
-            
+
+            # 生成带时间戳的文件名，保存到 data/ 目录
+            if filename is None:
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                filename = DATA_DIR / f"combined_{timestamp}.json"
+            else:
+                filename = DATA_DIR / filename
+
             # 保存到JSON文件
             try:
                 with open(filename, 'w', encoding='utf-8') as f:
@@ -427,7 +466,7 @@ try:
                 print(f"❌ 保存文件失败: {e}")
                 return False
         
-        def get_news_data(self, pages=5, save_file='combined_news.json'):
+        def get_news_data(self, pages=5, save_file=None):
             """主方法：获取所有新闻数据"""
             print(f"🚀 开始爬取所有数据源的新闻...")
             
@@ -462,8 +501,8 @@ try:
         try:
             # 获取所有新闻数据
             news_data = crawler.get_news_data(
-                pages=5, 
-                save_file='combined_news.json'
+                pages=5,
+                save_file=None  # 自动生成带时间戳的文件名
             )
             
             return news_data

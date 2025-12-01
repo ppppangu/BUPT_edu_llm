@@ -464,7 +464,7 @@
     <!-- Header -->
     <header>
         <div class="header-container">
-            <a href="{{ url_for('index') }}" class="logo">
+            <a href="./" class="logo">
                 <div class="logo-img">
                     <svg class="logo-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="12" cy="12" r="4"/>
@@ -474,9 +474,9 @@
                 <span class="logo-text">光伏资讯</span>
             </a>
             <nav>
-                <a href="{{ url_for('index') }}">主页</a>
-                <a href="{{ url_for('news_search') }}">国内新闻</a>
-                <a href="{{ url_for('translated_news') }}">国际新闻</a>
+                <a href="./">主页</a>
+                <a href="./news_search">国内新闻</a>
+                <a href="./translated_news">国际新闻</a>
             </nav>
         </div>
     </header>
@@ -596,7 +596,7 @@
         // 加载数据统计信息
         async function loadDataInfo() {
             try {
-                const response = await fetch('/api/news/stats');
+                const response = await fetch('./api/news/stats');
                 const data = await response.json();
 
                 if (data.success) {
@@ -641,7 +641,7 @@
                 if (keyword) params.append('keyword', keyword);
                 if (sourceFilter) params.append('source', sourceFilter);
 
-                const response = await fetch(`/api/news?${params}`);
+                const response = await fetch(`./api/news?${params}`);
                 const result = await response.json();
 
                 if (result.success) {
@@ -695,11 +695,12 @@
 
         // 更新统计信息
         function updateStats(result) {
-            document.getElementById('totalCount').textContent = result.total_count;
-            document.getElementById('filteredCount').textContent = result.count;
+            document.getElementById('totalCount').textContent = result.total_count || 0;
+            document.getElementById('filteredCount').textContent = result.count || 0;
 
-            const neaCount = result.filtered_source_stats['国家能源局'] || 0;
-            const govCount = result.filtered_source_stats['中国政府网'] || 0;
+            const stats = result.source_stats || {};
+            const neaCount = stats['国家能源局'] || 0;
+            const govCount = stats['中国政府网'] || 0;
 
             document.getElementById('neaCount').textContent = neaCount;
             document.getElementById('govCount').textContent = govCount;
@@ -726,7 +727,7 @@
         // 加载AI总结
         async function loadAISummary() {
             try {
-                const response = await fetch('/api/summary/domestic');
+                const response = await fetch('./api/summary/domestic');
                 const result = await response.json();
 
                 if (result.success && result.data) {

@@ -25,6 +25,11 @@ try:
             self.irena_url = "https://www.irena.org/News"
             self.driver = None
             self.content_data = []  # 初始化content_data属性，与其他爬虫保持一致
+
+            # 设置 NO_PROXY 以避免代理干扰 chromedriver 与浏览器的通信
+            os.environ['NO_PROXY'] = 'localhost,127.0.0.1'
+            os.environ['no_proxy'] = 'localhost,127.0.0.1'
+
             self.search_keywords = [
                 "solar energy",
                 "photovoltaic",
@@ -33,12 +38,24 @@ try:
             ]
             
         def _create_chrome_options(self):
-            """创建Chrome选项（每次调用都生成新的唯一目录）"""
+            """创建Chrome/Chromium选项（每次调用都生成新的唯一目录）"""
             chrome_options = Options()
 
             # 使用无头模式减少资源占用和冲突
             chrome_options.add_argument('--headless=new')
             chrome_options.add_argument('--disable-gpu')
+
+            # 指定 Chromium 浏览器路径（适配Linux环境）
+            chromium_paths = [
+                '/usr/bin/chromium',
+                '/usr/bin/chromium-browser',
+                '/usr/bin/google-chrome',
+                '/usr/bin/google-chrome-stable'
+            ]
+            for path in chromium_paths:
+                if os.path.exists(path):
+                    chrome_options.binary_location = path
+                    break
 
             # 修复ChromeDriver权限问题
             chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
