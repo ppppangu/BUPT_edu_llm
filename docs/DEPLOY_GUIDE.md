@@ -159,7 +159,7 @@ SOLAR_NEWS_WORKERS=4
 # Security
 DEBUG=false
 SECRET_KEY=<generate-a-random-secret-key>
-ALLOWED_HOSTS=your-domain.com,www.your-domain.com
+ALLOWED_HOSTS=edubeam.cn,www.edubeam.cn
 
 # Logging
 LOG_LEVEL=INFO
@@ -214,30 +214,32 @@ sudo yum install -y nginx
 
 ### 2. 配置反向代理
 
-复制项目配置文件：
+项目根目录提供了预配置好的 `nginx.conf`（域名: edubeam.cn，已启用 HTTPS）。
+
+**部署路径说明**：
+
+| 部署方式 | 路径 | 说明 |
+|----------|------|------|
+| 系统级部署 | `/opt/BUPT_edu_llm` | 推荐，nginx.conf 默认使用此路径 |
+| 用户目录部署 | `/home/bupt_llm/BUPT_edu_llm` | 适合权限受限环境 |
+
+如果使用用户目录部署，需要修改 `nginx.conf` 中的 `root` 路径。
+
+复制配置文件：
 
 ```bash
-sudo cp /home/bupt_llm/BUPT_edu_llm/nginx/bupt_edu_llm.conf /etc/nginx/sites-available/
-sudo ln -s /etc/nginx/sites-available/bupt_edu_llm.conf /etc/nginx/sites-enabled/
+# 系统级部署
+sudo cp /opt/BUPT_edu_llm/nginx.conf /etc/nginx/sites-available/edubeam.cn.conf
+
+# 或用户目录部署（需要先修改 nginx.conf 中的 root 路径）
+sudo cp /home/bupt_llm/BUPT_edu_llm/nginx.conf /etc/nginx/sites-available/edubeam.cn.conf
 ```
 
-编辑配置文件，更新路径：
+启用配置：
 
 ```bash
-sudo nano /etc/nginx/sites-available/bupt_edu_llm.conf
-```
-
-需要修改的地方：
-
-```nginx
-# Landing Page 路径
-location / {
-    root /home/bupt_llm/BUPT_edu_llm/landingpage;
-    # ...
-}
-
-# 域名（生产环境）
-server_name your-domain.com www.your-domain.com;
+sudo ln -s /etc/nginx/sites-available/edubeam.cn.conf /etc/nginx/sites-enabled/
+sudo rm /etc/nginx/sites-enabled/default  # 删除默认配置（可选）
 ```
 
 ### 3. 测试并重启 Nginx
@@ -251,20 +253,57 @@ sudo systemctl restart nginx
 sudo systemctl enable nginx
 ```
 
-### 4. 配置 SSL (可选但推荐)
+### 4. 配置 SSL
 
-使用 Let's Encrypt 获取免费 SSL 证书：
+#### 方式 A: 使用 Cloudflare Origin Certificate（推荐）
+
+如果使用 Cloudflare 作为 CDN，推荐使用 Origin Certificate：
+
+1. **获取 Origin Certificate**：
+   - 登录 Cloudflare Dashboard → 选择域名 → SSL/TLS → Origin Server
+   - 点击 "Create Certificate"
+   - 选择 RSA (2048) 或 ECC，有效期选择 15 年
+   - 下载证书（.pem）和私钥（.key）
+
+2. **上传证书到服务器**：
+   ```bash
+   sudo mkdir -p /etc/nginx/ssl
+   sudo nano /etc/nginx/ssl/edubeam.cn.pem    # 粘贴证书内容
+   sudo nano /etc/nginx/ssl/edubeam.cn.key    # 粘贴私钥内容
+   sudo chmod 600 /etc/nginx/ssl/edubeam.cn.key
+   ```
+
+3. **配置 Cloudflare SSL 模式**：
+   - Cloudflare Dashboard → SSL/TLS → Overview
+   - 选择 **Full (strict)** 模式
+
+4. **重载 Nginx**（如已按上面步骤配置）：
+   ```bash
+   sudo nginx -t && sudo systemctl reload nginx
+   ```
+
+#### 方式 B: 使用 Let's Encrypt（无 Cloudflare）
+
+如果不使用 Cloudflare，可以用 Let's Encrypt 获取免费 SSL 证书：
 
 ```bash
 # 安装 Certbot
 sudo apt install -y certbot python3-certbot-nginx
 
 # 获取证书
-sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+sudo certbot --nginx -d edubeam.cn -d www.edubeam.cn
 
-# 自动续期
+# 测试自动续期
 sudo certbot renew --dry-run
 ```
+
+#### 方式 C: Cloudflare Flexible 模式（不推荐）
+
+如果选择 Flexible 模式，源服务器无需 SSL 证书，但安全性较低（Cloudflare 到源站是明文）。
+
+需要修改 `nginx.conf`：
+- 只保留 80 端口的 server 块
+- 移除 SSL 相关配置
 
 ## 服务管理
 
