@@ -367,7 +367,7 @@
                                      :style="`width: ${activeStock.sentiment_score || 0}%`"></div>
                             </div>
                             <p class="font-sans text-xs text-stone-400 leading-relaxed max-w-[80%]">
-                                Real-time sentiment analysis based on news and social media.
+                                基于新闻与社交媒体的实时情绪分析。
                             </p>
                         </div>
 
@@ -657,6 +657,11 @@
                 window.addEventListener('resize', () => {
                     kChart?.resize();
                 });
+
+                // 延迟触发 resize，确保容器尺寸已经计算完成
+                setTimeout(() => {
+                    kChart?.resize();
+                }, 100);
             };
 
             // 工具函数
