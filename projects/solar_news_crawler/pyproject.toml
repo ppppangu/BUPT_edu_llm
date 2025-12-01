@@ -1,15 +1,16 @@
 [project]
 name = "solar-news-crawler"
-version = "0.2.0"
+version = "0.3.0"
 description = "光伏行业新闻爬虫与资讯聚合平台"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "apscheduler>=3.10.0",
     "beautifulsoup4>=4.12.2",
-    "flask>=2.3.3",
-    "gunicorn>=23.0.0",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
     "lxml>=4.9.3",
+    "python-dotenv>=1.0.0",
     "requests>=2.31.0",
     "selenium>=4.15.0",
     "webdriver-manager>=4.0.1",

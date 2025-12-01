@@ -1,0 +1,22 @@
+# 自动处理换行符
+* text=auto
+
+# Shell 脚本强制使用 LF 换行符（Linux 兼容）
+*.sh text eol=lf
+
+# Python 文件
+*.py text eol=lf
+
+# 配置文件
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+
+# 前端文件
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+
+# Markdown
+*.md text eol=lf

@@ -1,148 +1,127 @@
 # -*- coding: utf-8 -*-
-"""Flask 应用入口"""
-from flask import Flask, jsonify, render_template, request
+"""FastAPI 应用入口"""
+import logging
+from contextlib import asynccontextmanager
 
-from backend.config import FRONTEND_DIR, HOST, PORT
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
+
+from backend.config import FRONTEND_DIR, HOST, PORT, LOG_LEVEL
 from backend.services.news_service import news_service
-from backend.scheduler import start_scheduler
+from backend.scheduler import start_scheduler, stop_scheduler
 
-# 创建 Flask 应用
-app = Flask(
-    __name__,
-    template_folder=str(FRONTEND_DIR),
-    static_folder=str(FRONTEND_DIR),
-    static_url_path='/static'
+logging.basicConfig(
+    level=getattr(logging, LOG_LEVEL),
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """应用生命周期管理"""
+    logger.info("Solar News Crawler 启动中...")
+    start_scheduler()
+    yield
+    stop_scheduler()
+
+
+app = FastAPI(
+    title="Solar News Crawler",
+    version="0.3.0",
+    lifespan=lifespan,
+    docs_url="/api/docs",
+    redoc_url=None,
 )
 
-
-# ==================== 页面路由 ====================
-
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-
-@app.route("/news_search")
-def news_search():
-    return render_template("news_search.html")
-
-
-@app.route("/translated_news")
-def translated_news():
-    return render_template("translated_news.html")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # ==================== API 路由 ====================
 
-@app.route("/api/health")
-def health():
-    """健康检查接口"""
-    return jsonify({"status": "ok"})
+@app.get("/api/health")
+async def health():
+    return {"status": "ok"}
 
 
-# --- 国内新闻 API ---
-
-@app.route("/api/news")
-def get_news():
-    """获取筛选后的国内新闻数据"""
-    start_date = request.args.get("start_date")
-    end_date = request.args.get("end_date")
-    keyword = request.args.get("keyword", "").strip()
-    source = request.args.get("source", "").strip()
-
-    result = news_service.get_news(
+@app.get("/api/news")
+async def get_news(
+    start_date: str = None,
+    end_date: str = None,
+    keyword: str = "",
+    source: str = ""
+):
+    """国内新闻"""
+    return news_service.get_news(
         start_date=start_date,
         end_date=end_date,
-        keyword=keyword if keyword else None,
-        source=source if source else None
+        keyword=keyword.strip() or None,
+        source=source.strip() or None
     )
-    return jsonify(result)
 
 
-@app.route("/api/news/stats")
-def get_news_stats():
-    """获取国内新闻统计信息"""
-    return jsonify(news_service.get_news_stats())
+@app.get("/api/news/stats")
+async def get_news_stats():
+    return news_service.get_news_stats()
 
 
-# --- 国际新闻 API ---
-
-@app.route("/api/international")
-def get_international_news():
-    """获取筛选后的国际新闻数据"""
-    start_date = request.args.get("start_date")
-    end_date = request.args.get("end_date")
-    keyword = request.args.get("keyword", "").strip()
-    source = request.args.get("source", "").strip()
-
-    result = news_service.get_international_news(
+@app.get("/api/international")
+async def get_international_news(
+    start_date: str = None,
+    end_date: str = None,
+    keyword: str = "",
+    source: str = ""
+):
+    """国际新闻"""
+    return news_service.get_international_news(
         start_date=start_date,
         end_date=end_date,
-        keyword=keyword if keyword else None,
-        source=source if source else None
+        keyword=keyword.strip() or None,
+        source=source.strip() or None
     )
-    return jsonify(result)
 
 
-@app.route("/api/international/stats")
-def get_international_stats():
-    """获取国际新闻统计信息"""
-    return jsonify(news_service.get_international_stats())
+@app.get("/api/international/stats")
+async def get_international_stats():
+    return news_service.get_international_stats()
 
 
-# --- AI 总结 API ---
-
-@app.route("/api/summary/<news_type>")
-def get_ai_summary(news_type):
-    """
-    获取AI总结
-    news_type: domestic(国内) 或 international(国际)
-    """
-    return jsonify(news_service.get_ai_summary(news_type))
+@app.get("/api/summary/{news_type}")
+async def get_ai_summary(news_type: str):
+    """AI总结 (domestic/international)"""
+    return news_service.get_ai_summary(news_type)
 
 
-# ==================== 兼容旧 API（过渡期） ====================
-# 注：这些路由保留一段时间，方便旧前端迁移
+# ==================== 页面路由 ====================
 
-@app.route("/get_news")
-def legacy_get_news():
-    return get_news()
-
-
-@app.route("/get_stats")
-def legacy_get_stats():
-    return get_news_stats()
+@app.get("/")
+async def index():
+    return FileResponse(FRONTEND_DIR / "index.html")
 
 
-@app.route("/get_translated_news")
-def legacy_get_translated_news():
-    return get_international_news()
+@app.get("/news_search")
+async def news_search_page():
+    return FileResponse(FRONTEND_DIR / "news_search.html")
 
 
-@app.route("/get_translated_stats")
-def legacy_get_translated_stats():
-    return get_international_stats()
+@app.get("/translated_news")
+async def translated_news_page():
+    return FileResponse(FRONTEND_DIR / "translated_news.html")
 
 
-@app.route("/get_ai_summary/<news_type>")
-def legacy_get_ai_summary(news_type):
-    return get_ai_summary(news_type)
+# ==================== 静态文件 ====================
 
-
-# ==================== 应用启动 ====================
-
-def create_app():
-    """创建应用实例（供 gunicorn 使用）"""
-    # 启动后台调度器（如果没有数据则立即抓取）
-    start_scheduler(run_immediately=True)
-    return app
+app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 
 if __name__ == "__main__":
-    print(f"启动 Flask 应用...")
-    print(f"访问 http://{HOST}:{PORT} 查看网站")
-
-    # 启动后台调度器
-    start_scheduler()
-
-    app.run(debug=True, host=HOST, port=PORT)
+    import uvicorn
+    uvicorn.run(app, host=HOST, port=PORT, log_level=LOG_LEVEL.lower())
