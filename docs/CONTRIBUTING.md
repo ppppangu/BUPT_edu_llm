@@ -119,6 +119,45 @@ backend/
     └── xxx_service.py   # 其他业务服务
 ```
 
+### 前端架构规范
+
+#### API 基础路径自动检测
+
+**重要**：前端代码**不能写死** API 路径，必须根据部署环境自动检测。
+
+**问题场景**：
+
+| 访问方式 | 写死 `/api/xxx` 的结果 |
+|----------|------------------------|
+| 本地开发 `http://127.0.0.1:5001/` | ✅ 正常（请求 `/api/xxx`） |
+| 公网访问 `https://edubeam.cn/alpha_sentiment/` | ❌ 404（应请求 `/alpha_sentiment/api/xxx`） |
+
+**解决方案**：在前端 JavaScript 中添加路径检测函数：
+
+```javascript
+// API 基础路径（自动检测是否在子路径下部署）
+const getApiBase = () => {
+    const path = window.location.pathname;
+    // 检测当前页面是否在子路径下
+    if (path.includes('/your_project')) {
+        return '/your_project/api';  // 子路径部署
+    }
+    return '/api';  // 根路径部署（本地开发）
+};
+const API_BASE = getApiBase();
+
+// 使用示例
+fetch(`${API_BASE}/health`);      // 而不是 fetch('/api/health')
+fetch(`${API_BASE}/data`);        // 而不是 fetch('/api/data')
+```
+
+**工作原理**：
+
+| 访问 URL | `window.location.pathname` | `API_BASE` | 实际请求 |
+|----------|---------------------------|------------|----------|
+| `http://127.0.0.1:5001/` | `/` | `/api` | `/api/health` |
+| `https://edubeam.cn/alpha_sentiment/` | `/alpha_sentiment/` | `/alpha_sentiment/api` | `/alpha_sentiment/api/health` |
+
 ### README 规范
 
 由于每个子项目的后端/前端实现各不相同，**每个子项目必须在 README.md 中清晰说明以下内容**：

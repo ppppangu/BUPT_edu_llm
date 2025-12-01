@@ -484,12 +484,22 @@
             const updateTime = ref('--');
             let kChart = null;
 
+            // API 基础路径（自动检测是否在子路径下部署）
+            const getApiBase = () => {
+                const path = window.location.pathname;
+                if (path.includes('/alpha_sentiment')) {
+                    return '/alpha_sentiment/api';
+                }
+                return '/api';
+            };
+            const API_BASE = getApiBase();
+
             // 获取热门股票列表（从 API 获取）
             const fetchHotStocks = async () => {
                 loading.value = true;
                 error.value = null;
                 try {
-                    const response = await fetch('/api/hot_stocks');
+                    const response = await fetch(`${API_BASE}/hot_stocks`);
                     if (!response.ok) throw new Error('Failed to fetch data');
                     const data = await response.json();
                     hotStocks.value = data.stocks || [];
@@ -506,7 +516,7 @@
             const fetchStockDetail = async (code) => {
                 detailLoading.value = true;
                 try {
-                    const response = await fetch(`/api/stock/${code}`);
+                    const response = await fetch(`${API_BASE}/stock/${code}`);
                     if (!response.ok) {
                         stockDetail.value = null;
                         return;

@@ -1,5 +1,6 @@
 """数据获取服务 - 基于 AkShare 获取 A 股数据"""
 import akshare as ak
+import asyncio
 import logging
 import time
 from datetime import datetime, timedelta
@@ -308,6 +309,89 @@ class DataFetcher:
             logger.warning(f"获取股票 {symbol} 千股千评失败: {e}")
             return None
 
+    def fetch_all_news(self) -> dict[str, list[NewsData]]:
+        """一次性获取全市场新闻，按股票名称分组
+
+        Returns:
+            dict: {股票名称: [新闻列表]}
+        """
+        try:
+            df = ak.stock_news_main_cx()
+            if df is None or df.empty:
+                logger.info("无法获取财联社新闻")
+                return {}
+
+            # 存储原始数据供后续过滤
+            all_news = []
+            for _, row in df.iterrows():
+                all_news.append({
+                    "tag": str(row.get("tag", "")),
+                    "summary": str(row.get("summary", "")),
+                    "pub_time": str(row.get("pub_time", "")),
+                    "url": str(row.get("url", ""))
+                })
+
+            logger.info(f"批量获取财联社新闻成功，共 {len(all_news)} 条")
+            return {"_raw": all_news}  # 返回原始数据，由调用方过滤
+
+        except Exception as e:
+            logger.warning(f"批量获取新闻失败: {e}")
+            return {}
+
+    def filter_news_for_stock(self, stock_name: str, raw_news: list[dict], limit: int = 10) -> list[NewsData]:
+        """从预获取的新闻中过滤特定股票的新闻"""
+        news_list = []
+        for item in raw_news:
+            tag = item.get("tag", "")
+            summary = item.get("summary", "")
+
+            if stock_name in tag or stock_name in summary:
+                news_list.append(NewsData(
+                    title=tag,
+                    content=summary,
+                    source="财联社",
+                    publish_time=item.get("pub_time", ""),
+                    url=item.get("url", "")
+                ))
+                if len(news_list) >= limit:
+                    break
+
+        return news_list
+
+    def fetch_all_ratings(self) -> dict[str, StockRating]:
+        """一次性获取全市场千股千评数据
+
+        Returns:
+            dict: {股票代码: StockRating}
+        """
+        try:
+            df = ak.stock_comment_em()
+            if df is None or df.empty:
+                logger.info("无法获取千股千评数据")
+                return {}
+
+            ratings = {}
+            for _, row in df.iterrows():
+                code = str(row.get("代码", ""))
+                if code:
+                    ratings[code] = StockRating(
+                        score=float(row.get("综合得分", 0) or 0),
+                        institution_ratio=float(row.get("机构参与度", 0) or 0),
+                        attention_index=float(row.get("关注指数", 0) or 0),
+                        rank=int(row.get("目前排名", 0) or 0),
+                        rank_change=int(row.get("上升", 0) or 0),
+                        main_cost=float(row.get("主力成本", 0) or 0),
+                        pe_ratio=float(row.get("市盈率", 0) or 0),
+                        turnover_rate=float(row.get("换手率", 0) or 0)
+                    )
+
+            logger.info(f"批量获取千股千评成功，共 {len(ratings)} 只股票")
+            return ratings
+
+        except Exception as e:
+            logger.warning(f"批量获取千股千评失败: {e}")
+            return {}
+
     def get_all_stock_data(self, symbol: str, name: str = "") -> StockAllData:
         """获取完整数据
 
@@ -322,25 +406,85 @@ class DataFetcher:
             rating=self.get_stock_rating(symbol)
         )
 
+    async def get_stock_data_async(
+        self,
+        symbol: str,
+        name: str = "",
+        price_info: Optional[StockPrice] = None,
+        raw_news: Optional[list[dict]] = None,
+        all_ratings: Optional[dict[str, StockRating]] = None
+    ) -> StockAllData:
+        """异步并发获取股票数据（优化版）
+
+        Args:
+            symbol: 股票代码
+            name: 股票名称（用于新闻过滤）
+            price_info: 已有的价格信息（可选，避免重复获取）
+            raw_news: 预获取的全市场新闻原始数据（可选，避免重复API调用）
+            all_ratings: 预获取的全市场千股千评数据（可选，避免重复API调用）
+
+        Returns:
+            StockAllData: 包含所有数据的对象
+        """
+        code = self._clean_symbol(symbol)
+
+        # 如果有预获取数据，直接从内存过滤，不需要API调用
+        news = []
+        if raw_news is not None:
+            news = self.filter_news_for_stock(name, raw_news) if name else []
+
+        rating = None
+        if all_ratings is not None:
+            rating = all_ratings.get(code)
+
+        # 只需要获取 K线数据（每只股票独立）
+        kline_task = asyncio.to_thread(self.get_stock_kline, symbol)
+
+        # 如果没有预获取数据，则并发调用原有方法
+        tasks = [kline_task]
+        need_news = raw_news is None and name
+        need_rating = all_ratings is None
+
+        if need_news:
+            tasks.append(asyncio.to_thread(self.get_stock_news, name))
+        if need_rating:
+            tasks.append(asyncio.to_thread(self.get_stock_rating, symbol))
+
+        # 并发执行
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        # 解析结果
+        kline = results[0] if not isinstance(results[0], Exception) else []
+
+        idx = 1
+        if need_news:
+            news = results[idx] if not isinstance(results[idx], Exception) else []
+            idx += 1
+        if need_rating:
+            rating = results[idx] if not isinstance(results[idx], Exception) else None
+
+        # 记录异常
+        for i, result in enumerate(results):
+            if isinstance(result, Exception):
+                logger.warning(f"获取股票 {symbol} 数据时任务 {i} 失败: {result}")
+
+        return StockAllData(
+            price_info=price_info,
+            kline=kline,
+            news=news,
+            rating=rating
+        )
+
     def verify_data_source(self) -> bool:
-        """启动时验证数据源，获取样例股票数据"""
-        logger.info(f"正在验证数据源，获取样例股票 {SAMPLE_STOCK_CODE} 数据...")
+        """启动时验证数据源（简化版：只验证网络连通性）
+
+        注意：具体的数据获取会在实际爬取时自然验证，无需提前单独验证
+        """
+        logger.info("正在验证数据源连接...")
 
         if not self.check_network():
             logger.error("网络连接失败，无法连接 AkShare 数据源")
             return False
-
-        price = self.get_stock_price(SAMPLE_STOCK_CODE)
-        if price is None:
-            logger.error(f"获取样例股票 {SAMPLE_STOCK_CODE} 价格失败")
-            return False
-        logger.info(f"样例股票价格: {price.name} ({price.code}) - ¥{price.price:.2f} ({price.change:+.2f}%)")
-
-        klines = self.get_stock_kline(SAMPLE_STOCK_CODE, days=5)
-        if not klines:
-            logger.error(f"获取样例股票 {SAMPLE_STOCK_CODE} K线数据失败")
-            return False
-        logger.info(f"样例股票K线: 最近 {len(klines)} 个交易日数据获取成功")
 
         logger.info("数据源验证通过，AkShare 连接正常")
         return True

@@ -61,27 +61,57 @@ class DataGenerator:
         # 获取重试配置
         _, _, self.max_retries, self.retry_delay = _get_config()
 
-    async def _fetch_stock_async(self, stock: Any, index: int, total: int) -> dict:
+    async def _fetch_stock_async(
+        self,
+        stock: Any,
+        index: int,
+        total: int,
+        raw_news: list[dict] | None = None,
+        all_ratings: dict | None = None
+    ) -> dict:
         """
         异步获取单只股票数据（带重试）
 
+        优化点：
+        1. 复用 hot_stocks 中已有的 price/change，避免重复调用 API
+        2. 复用预获取的新闻和千股千评数据，避免重复调用全市场 API
+        3. 只需并发获取各股票独立的 K线数据
+
         Args:
-            stock: 股票对象
+            stock: 股票对象（包含 code, name, price, change）
             index: 当前索引
             total: 总数
+            raw_news: 预获取的全市场新闻原始数据
+            all_ratings: 预获取的全市场千股千评数据
 
         Returns:
             包含 stock, stock_data, analysis 的字典，失败时 stock_data 为 None
         """
+        from ..models.schemas import StockPrice
+
         code = stock.code
         name = stock.name
         logger.info(f"[{index}/{total}] 开始获取: {code} {name}")
 
+        # 复用 hot_stocks 中已有的价格信息，避免重复调用 API
+        price_info = StockPrice(
+            code=code,
+            name=name,
+            price=stock.price,
+            change=stock.change,
+            volume=0,
+            amount=0
+        )
+
         for attempt in range(self.max_retries):
             try:
-                # 用 to_thread 包装同步的 AkShare 调用
-                stock_data = await asyncio.to_thread(
-                    self.data_fetcher.get_all_stock_data, code, name
+                # 使用优化后的异步方法（传入预获取的数据，只获取 K线）
+                stock_data = await self.data_fetcher.get_stock_data_async(
+                    symbol=code,
+                    name=name,
+                    price_info=price_info,
+                    raw_news=raw_news,
+                    all_ratings=all_ratings
                 )
 
                 # 情绪分析也用 to_thread（涉及网络请求）
@@ -106,10 +136,21 @@ class DataGenerator:
 
         return {"stock": stock, "stock_data": None, "analysis": None}
 
-    async def _fetch_all_stocks_async(self, hot_stocks: list) -> list[dict]:
-        """并发获取所有股票数据"""
+    async def _fetch_all_stocks_async(
+        self,
+        hot_stocks: list,
+        raw_news: list[dict] | None = None,
+        all_ratings: dict | None = None
+    ) -> list[dict]:
+        """并发获取所有股票数据
+
+        Args:
+            hot_stocks: 热门股票列表
+            raw_news: 预获取的全市场新闻原始数据
+            all_ratings: 预获取的全市场千股千评数据
+        """
         tasks = [
-            self._fetch_stock_async(stock, i, len(hot_stocks))
+            self._fetch_stock_async(stock, i, len(hot_stocks), raw_news, all_ratings)
             for i, stock in enumerate(hot_stocks, 1)
         ]
         # 并发执行所有任务
@@ -162,12 +203,23 @@ class DataGenerator:
             logger.error("获取热门股票失败")
             return False
 
-        logger.info(f"获取到 {len(hot_stocks)} 只热门股票，开始并发获取详情...")
+        logger.info(f"获取到 {len(hot_stocks)} 只热门股票")
 
-        # 3. 并发获取所有股票数据
-        results = asyncio.run(self._fetch_all_stocks_async(hot_stocks))
+        # 3. 批量预获取全市场新闻和千股千评（各调用一次 API）
+        logger.info("批量获取全市场新闻...")
+        news_data = self.data_fetcher.fetch_all_news()
+        raw_news = news_data.get("_raw", [])
+        logger.info(f"获取到 {len(raw_news)} 条全市场新闻")
 
-        # 4. 处理结果
+        logger.info("批量获取全市场千股千评...")
+        all_ratings = self.data_fetcher.fetch_all_ratings()
+        logger.info(f"获取到 {len(all_ratings)} 只股票的千股千评数据")
+
+        # 4. 并发获取所有股票数据（只需获取各股票独立的 K线）
+        logger.info("开始并发获取各股票 K线数据...")
+        results = asyncio.run(self._fetch_all_stocks_async(hot_stocks, raw_news, all_ratings))
+
+        # 5. 处理结果
         enriched_stocks = []
         stock_details = {}
 
@@ -234,7 +286,7 @@ class DataGenerator:
 
             enriched_stocks.append(enriched_stock)
 
-        # 5. 保存静态文件（原子性写入，确保数据一致性）
+        # 6. 保存静态文件（原子性写入，确保数据一致性）
         timestamp = datetime.now().isoformat()
         success_count = len([s for s in enriched_stocks if s.get("sentiment_score") is not None])
         failed_count = len(enriched_stocks) - success_count
