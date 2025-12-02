@@ -7,7 +7,7 @@
 ```
 solar_news_crawler/
 ├── backend/                     # 后端服务
-│   ├── main.py                 # Flask 入口，定义 API 路由
+│   ├── main.py                 # FastAPI 入口，定义 API 路由
 │   ├── config.py               # 配置管理，读取环境变量
 │   ├── scheduler.py            # APScheduler 定时任务
 │   └── services/               # 业务逻辑层

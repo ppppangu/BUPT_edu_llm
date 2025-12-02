@@ -67,7 +67,7 @@ uv sync
 uv run python -m backend.main
 ```
 
-### 生产部署
+## 生产部署
 
 ```bash
 # 使用统一启动脚本

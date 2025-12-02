@@ -156,7 +156,7 @@
                             >文档</a
                         >
                     </div>
-                    <div>
+                    <div class="flex items-center space-x-4">
                         <a
                             href="https://github.com/ppppangu/BUPT_edu_llm"
                             target="_blank"
@@ -164,6 +164,42 @@
                         >
                             GitHub <i class="fab fa-github ml-1"></i>
                         </a>
+                        <!-- 移动端汉堡菜单按钮 -->
+                        <button
+                            id="mobile-menu-btn"
+                            class="md:hidden p-2 text-apple-dark hover:text-apple-blue transition-colors"
+                            aria-label="打开菜单"
+                        >
+                            <i class="fa-solid fa-bars text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- 移动端下拉菜单 -->
+                <div
+                    id="mobile-menu"
+                    class="hidden md:hidden pb-4 border-t border-gray-100 mt-2"
+                >
+                    <div class="flex flex-col space-y-3 pt-3">
+                        <a
+                            href="#projects"
+                            class="text-sm text-apple-dark hover:text-apple-blue transition-colors py-2"
+                            >项目展示</a
+                        >
+                        <a
+                            href="#features"
+                            class="text-sm text-apple-dark hover:text-apple-blue transition-colors py-2"
+                            >平台特性</a
+                        >
+                        <a
+                            href="#tech"
+                            class="text-sm text-apple-dark hover:text-apple-blue transition-colors py-2"
+                            >技术架构</a
+                        >
+                        <a
+                            href="#docs"
+                            class="text-sm text-apple-dark hover:text-apple-blue transition-colors py-2"
+                            >文档</a
+                        >
                     </div>
                 </div>
             </div>
@@ -251,9 +287,11 @@
                             ></i>
                         </div>
                         <div class="mt-auto">
-                            <span
+                            <a
+                                href="https://github.com/ppppangu/BUPT_edu_llm/blob/main/docs/CONTRIBUTING.md"
+                                target="_blank"
                                 class="text-apple-blue font-semibold cursor-pointer hover:underline"
-                                >了解架构设计 ></span
+                                >了解架构设计 ></a
                             >
                         </div>
                     </div>
@@ -593,7 +631,7 @@
                                 >
                             </li>
                             <li>
-                                <a href="#" class="hover:underline">更新日志</a>
+                                <a href="https://github.com/ppppangu/BUPT_edu_llm/releases" target="_blank" class="hover:underline">更新日志</a>
                             </li>
                         </ul>
                     </div>
@@ -601,7 +639,7 @@
                         <h3 class="font-semibold text-apple-dark mb-3">资源</h3>
                         <ul class="space-y-2">
                             <li>
-                                <a href="#" class="hover:underline">API 文档</a>
+                                <a href="/alpha_sentiment/api/docs" target="_blank" class="hover:underline">API 文档</a>
                             </li>
                             <li>
                                 <a href="https://github.com/ppppangu/BUPT_edu_llm/blob/main/docs/DEPLOY_GUIDE.md" target="_blank" class="hover:underline">部署指南</a>
@@ -615,15 +653,12 @@
                         <h3 class="font-semibold text-apple-dark mb-3">关于</h3>
                         <ul class="space-y-2">
                             <li>
-                                <a href="#" class="hover:underline"
+                                <a href="https://github.com/ppppangu/BUPT_edu_llm" target="_blank" class="hover:underline"
                                     >BUPT EDU Team</a
                                 >
                             </li>
                             <li>
-                                <a href="#" class="hover:underline">联系我们</a>
-                            </li>
-                            <li>
-                                <a href="#" class="hover:underline">隐私政策</a>
+                                <a href="https://github.com/ppppangu/BUPT_edu_llm/issues" target="_blank" class="hover:underline">联系我们</a>
                             </li>
                         </ul>
                     </div>
@@ -639,7 +674,7 @@
                         <span class="mr-4"
                             >Built with passion for education</span
                         >
-                        <a href="#" class="hover:text-apple-dark"
+                        <a href="https://github.com/ppppangu/BUPT_edu_llm/blob/main/LICENSE" target="_blank" class="hover:text-apple-dark"
                             >MIT License</a
                         >
                     </div>
@@ -648,6 +683,32 @@
         </footer>
 
         <script>
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+            const mobileMenu = document.getElementById("mobile-menu");
+            const menuIcon = mobileMenuBtn.querySelector("i");
+
+            mobileMenuBtn.addEventListener("click", () => {
+                mobileMenu.classList.toggle("hidden");
+                // 切换图标
+                if (mobileMenu.classList.contains("hidden")) {
+                    menuIcon.classList.remove("fa-xmark");
+                    menuIcon.classList.add("fa-bars");
+                } else {
+                    menuIcon.classList.remove("fa-bars");
+                    menuIcon.classList.add("fa-xmark");
+                }
+            });
+
+            // 点击菜单项后关闭菜单
+            mobileMenu.querySelectorAll("a").forEach((link) => {
+                link.addEventListener("click", () => {
+                    mobileMenu.classList.add("hidden");
+                    menuIcon.classList.remove("fa-xmark");
+                    menuIcon.classList.add("fa-bars");
+                });
+            });
+
             // Navbar scroll effect
             window.addEventListener("scroll", () => {
                 const nav = document.getElementById("navbar");

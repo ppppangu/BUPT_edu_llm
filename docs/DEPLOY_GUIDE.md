@@ -90,14 +90,20 @@ chmod +x scripts/*.sh
 ./scripts/start_all.sh
 
 # 方式 2: 手动启动各服务
-cd solar_news_crawler/solar_news_crawler
-python app.py
+# Solar News Crawler
+cd projects/solar_news_crawler
+uv run python -m backend.main
+
+# Alpha Sentiment
+cd projects/alpha_sentiment
+uv run python -m backend.main
 ```
 
 ### 5. 访问应用
 
-- Landing Page: http://localhost/
-- Solar News Crawler: http://localhost:5000/
+- Landing Page: http://localhost/ (需配置 Nginx)
+- Solar News Crawler: http://127.0.0.1:5000/
+- Alpha Sentiment: http://127.0.0.1:5001/
 
 ## 生产环境部署
 
@@ -181,9 +187,32 @@ After=network.target
 Type=simple
 User=bupt_llm
 Group=bupt_llm
-WorkingDirectory=/home/bupt_llm/BUPT_edu_llm/solar_news_crawler/solar_news_crawler
-Environment="PATH=/home/bupt_llm/BUPT_edu_llm/.venv/bin"
-ExecStart=/home/bupt_llm/BUPT_edu_llm/.venv/bin/gunicorn -w 4 -b 127.0.0.1:5000 app:app
+WorkingDirectory=/opt/BUPT_edu_llm/projects/solar_news_crawler
+Environment="PATH=/opt/BUPT_edu_llm/.venv/bin"
+ExecStart=/opt/BUPT_edu_llm/.venv/bin/python -m backend.main
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+#### Alpha Sentiment 服务
+
+创建 `/etc/systemd/system/alpha-sentiment.service`:
+
+```ini
+[Unit]
+Description=Alpha Sentiment Service
+After=network.target
+
+[Service]
+Type=simple
+User=bupt_llm
+Group=bupt_llm
+WorkingDirectory=/opt/BUPT_edu_llm/projects/alpha_sentiment
+Environment="PATH=/opt/BUPT_edu_llm/.venv/bin"
+ExecStart=/opt/BUPT_edu_llm/.venv/bin/python -m backend.main
 Restart=always
 RestartSec=10
 
@@ -195,9 +224,18 @@ WantedBy=multi-user.target
 
 ```bash
 sudo systemctl daemon-reload
+
+# Solar News Crawler
 sudo systemctl enable solar-news-crawler
 sudo systemctl start solar-news-crawler
+
+# Alpha Sentiment
+sudo systemctl enable alpha-sentiment
+sudo systemctl start alpha-sentiment
+
+# 检查状态
 sudo systemctl status solar-news-crawler
+sudo systemctl status alpha-sentiment
 ```
 
 ## Nginx 配置
@@ -348,17 +386,22 @@ sudo systemctl restart nginx
 
 ## 定时任务配置
 
-为 Solar News Crawler 配置定时爬虫任务：
+> **注意**：两个子项目均已内置 APScheduler 定时任务，服务启动后会自动运行，无需配置系统 crontab。
+
+| 项目 | 定时任务 | 执行时间 |
+|------|----------|----------|
+| Solar News Crawler | 新闻爬取、翻译、AI总结 | 每日凌晨 2:00 |
+| Alpha Sentiment | 热门股票数据刷新 | 每日 15:30（收盘后） |
+
+如需手动触发数据刷新：
 
 ```bash
-# 编辑 crontab
-crontab -e
+# Alpha Sentiment - 调用 API
+curl -X POST http://127.0.0.1:5001/api/refresh
 
-# 添加以下行（每天凌晨 2 点运行爬虫）
-0 2 * * * cd /home/bupt_llm/BUPT_edu_llm/solar_news_crawler/solar_news_crawler && /home/bupt_llm/BUPT_edu_llm/.venv/bin/python master_crawler.py daily >> /home/bupt_llm/BUPT_edu_llm/logs/crawler_cron.log 2>&1
-
-# 每天凌晨 3 点运行翻译
-0 3 * * * cd /home/bupt_llm/BUPT_edu_llm/solar_news_crawler/solar_news_crawler && /home/bupt_llm/BUPT_edu_llm/.venv/bin/python translator.py >> /home/bupt_llm/BUPT_edu_llm/logs/translator_cron.log 2>&1
+# 或使用命令行
+cd /opt/BUPT_edu_llm/projects/alpha_sentiment
+/opt/BUPT_edu_llm/.venv/bin/python -m backend.services.data_generator --run
 ```
 
 ## 故障排查
@@ -385,7 +428,9 @@ sudo chown -R bupt_llm:bupt_llm /home/bupt_llm/BUPT_edu_llm
 
 ```bash
 sudo systemctl status solar-news-crawler
-curl http://127.0.0.1:5000
+sudo systemctl status alpha-sentiment
+curl http://127.0.0.1:5000/api/health
+curl http://127.0.0.1:5001/api/health
 ```
 
 **检查 Nginx 配置**：
@@ -421,12 +466,16 @@ sudo firewall-cmd --permanent --add-service=https
 sudo firewall-cmd --reload
 ```
 
-### 4. 数据库连接问题
+### 4. 数据文件问题
 
-检查数据库文件权限：
+检查数据文件是否正常生成：
 
 ```bash
-ls -la /home/bupt_llm/BUPT_edu_llm/solar_news_crawler/solar_news_crawler/*.db
+# Solar News Crawler 数据
+ls -la /opt/BUPT_edu_llm/projects/solar_news_crawler/data/
+
+# Alpha Sentiment 数据
+ls -la /opt/BUPT_edu_llm/projects/alpha_sentiment/data/
 ```
 
 ### 5. 内存不足
@@ -469,13 +518,13 @@ location /solar_news/ {
 }
 ```
 
-### 3. 数据库优化
+### 3. 数据清理
 
-定期清理旧数据，优化数据库：
+数据以 JSON 文件形式存储在 `data/` 目录，如需清理旧数据：
 
 ```bash
-# 添加到 crontab
-0 4 * * 0 cd /path/to/solar_news_crawler && python cleanup_old_data.py
+# 清理 30 天前的数据文件（可选）
+find /opt/BUPT_edu_llm/projects/*/data -name "*.json" -mtime +30 -delete
 ```
 
 ## 监控与告警
@@ -505,7 +554,7 @@ location /solar_news/ {
 
 ## 备份策略
 
-### 1. 数据库备份
+### 1. 数据备份
 
 ```bash
 #!/bin/bash
@@ -515,19 +564,24 @@ BACKUP_DIR="/home/bupt_llm/backups"
 DATE=$(date +%Y%m%d_%H%M%S)
 
 mkdir -p $BACKUP_DIR
-cp /home/bupt_llm/BUPT_edu_llm/solar_news_crawler/solar_news_crawler/*.db $BACKUP_DIR/db_backup_$DATE.db
+
+# 备份所有项目的数据文件
+tar -czf $BACKUP_DIR/data_backup_$DATE.tar.gz \
+    /opt/BUPT_edu_llm/projects/solar_news_crawler/data \
+    /opt/BUPT_edu_llm/projects/alpha_sentiment/data
 
 # 删除 30 天前的备份
-find $BACKUP_DIR -name "db_backup_*.db" -mtime +30 -delete
+find $BACKUP_DIR -name "data_backup_*.tar.gz" -mtime +30 -delete
 ```
 
 ### 2. 配置文件备份
 
 ```bash
 tar -czf ~/config_backup_$(date +%Y%m%d).tar.gz \
-    /home/bupt_llm/BUPT_edu_llm/.env \
-    /etc/nginx/sites-available/bupt_edu_llm.conf \
-    /etc/systemd/system/solar-news-crawler.service
+    /opt/BUPT_edu_llm/projects/*/.env \
+    /etc/nginx/sites-available/edubeam.cn.conf \
+    /etc/systemd/system/solar-news-crawler.service \
+    /etc/systemd/system/alpha-sentiment.service
 ```
 
 ## 安全建议

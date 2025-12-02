@@ -50,17 +50,34 @@
         .logo-img {
             width: 40px;
             height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #0052CC 0%, #2684FF 100%);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .logo-svg {
-            width: 24px;
-            height: 24px;
-            fill: white;
+            width: 40px;
+            height: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover .logo-svg {
+            transform: scale(1.1);
+        }
+
+        /* Logo 波浪线动画 */
+        @keyframes wave-flow {
+            0%, 100% {
+                stroke-dashoffset: 0;
+            }
+            50% {
+                stroke-dashoffset: 10;
+            }
+        }
+
+        .logo-svg g path {
+            stroke-dasharray: 5, 5;
+            animation: wave-flow 3s linear infinite;
         }
 
         .logo-text {
@@ -466,9 +483,56 @@
         <div class="header-container">
             <a href="./" class="logo">
                 <div class="logo-img">
-                    <svg class="logo-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="4"/>
-                        <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+                    <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <!-- 中心太阳 -->
+                        <circle cx="50" cy="50" r="12" fill="url(#sunGradient)">
+                            <animate attributeName="r" values="12;13;12" dur="3s" repeatCount="indefinite"/>
+                        </circle>
+
+                        <!-- 蓝色波浪线 - 8个方向 -->
+                        <g stroke="url(#waveGradient)" stroke-width="1.5" fill="none" stroke-linecap="round">
+                            <!-- 右 -->
+                            <path d="M 62 50 Q 70 48, 78 50 Q 86 52, 94 50" opacity="0.9"/>
+                            <path d="M 62 50 Q 68 46, 74 48 Q 80 50, 86 48" opacity="0.7"/>
+                            <path d="M 62 50 Q 68 54, 74 52 Q 80 50, 86 52" opacity="0.7"/>
+                            <!-- 左 -->
+                            <path d="M 38 50 Q 30 48, 22 50 Q 14 52, 6 50" opacity="0.9"/>
+                            <path d="M 38 50 Q 32 46, 26 48 Q 20 50, 14 48" opacity="0.7"/>
+                            <path d="M 38 50 Q 32 54, 26 52 Q 20 50, 14 52" opacity="0.7"/>
+                            <!-- 上 -->
+                            <path d="M 50 38 Q 48 30, 50 22 Q 52 14, 50 6" opacity="0.9"/>
+                            <path d="M 50 38 Q 46 32, 48 26 Q 50 20, 48 14" opacity="0.7"/>
+                            <path d="M 50 38 Q 54 32, 52 26 Q 50 20, 52 14" opacity="0.7"/>
+                            <!-- 下 -->
+                            <path d="M 50 62 Q 48 70, 50 78 Q 52 86, 50 94" opacity="0.9"/>
+                            <path d="M 50 62 Q 46 68, 48 74 Q 50 80, 48 86" opacity="0.7"/>
+                            <path d="M 50 62 Q 54 68, 52 74 Q 50 80, 52 86" opacity="0.7"/>
+                            <!-- 右上 -->
+                            <path d="M 59 41 Q 67 33, 75 25 Q 83 17, 91 9" opacity="0.8"/>
+                            <path d="M 59 41 Q 65 35, 71 29 Q 77 23, 83 17" opacity="0.6"/>
+                            <!-- 右下 -->
+                            <path d="M 59 59 Q 67 67, 75 75 Q 83 83, 91 91" opacity="0.8"/>
+                            <path d="M 59 59 Q 65 65, 71 71 Q 77 77, 83 83" opacity="0.6"/>
+                            <!-- 左上 -->
+                            <path d="M 41 41 Q 33 33, 25 25 Q 17 17, 9 9" opacity="0.8"/>
+                            <path d="M 41 41 Q 35 35, 29 29 Q 23 23, 17 17" opacity="0.6"/>
+                            <!-- 左下 -->
+                            <path d="M 41 59 Q 33 67, 25 75 Q 17 83, 9 91" opacity="0.8"/>
+                            <path d="M 41 59 Q 35 65, 29 71 Q 23 77, 17 83" opacity="0.6"/>
+                        </g>
+
+                        <!-- 渐变定义 -->
+                        <defs>
+                            <linearGradient id="sunGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#2684FF;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#0052CC;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4C9AFF;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#2684FF;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#0052CC;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
                     </svg>
                 </div>
                 <span class="logo-text">光伏资讯</span>
