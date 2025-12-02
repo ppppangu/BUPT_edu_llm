@@ -187,9 +187,9 @@ After=network.target
 Type=simple
 User=bupt_llm
 Group=bupt_llm
-WorkingDirectory=/opt/BUPT_edu_llm/projects/solar_news_crawler
-Environment="PATH=/opt/BUPT_edu_llm/.venv/bin"
-ExecStart=/opt/BUPT_edu_llm/.venv/bin/python -m backend.main
+WorkingDirectory=/data/BUPT_edu_llm/projects/solar_news_crawler
+Environment="PATH=/data/BUPT_edu_llm/.venv/bin"
+ExecStart=/data/BUPT_edu_llm/.venv/bin/python -m backend.main
 Restart=always
 RestartSec=10
 
@@ -210,9 +210,9 @@ After=network.target
 Type=simple
 User=bupt_llm
 Group=bupt_llm
-WorkingDirectory=/opt/BUPT_edu_llm/projects/alpha_sentiment
-Environment="PATH=/opt/BUPT_edu_llm/.venv/bin"
-ExecStart=/opt/BUPT_edu_llm/.venv/bin/python -m backend.main
+WorkingDirectory=/data/BUPT_edu_llm/projects/alpha_sentiment
+Environment="PATH=/data/BUPT_edu_llm/.venv/bin"
+ExecStart=/data/BUPT_edu_llm/.venv/bin/python -m backend.main
 Restart=always
 RestartSec=10
 
@@ -258,7 +258,7 @@ sudo yum install -y nginx
 
 | 部署方式 | 路径 | 说明 |
 |----------|------|------|
-| 系统级部署 | `/opt/BUPT_edu_llm` | 推荐，nginx.conf 默认使用此路径 |
+| 系统级部署 | `/data/BUPT_edu_llm` | 推荐，nginx.conf 默认使用此路径 |
 | 用户目录部署 | `/home/bupt_llm/BUPT_edu_llm` | 适合权限受限环境 |
 
 如果使用用户目录部署，需要修改 `nginx.conf` 中的 `root` 路径。
@@ -267,7 +267,7 @@ sudo yum install -y nginx
 
 ```bash
 # 系统级部署
-sudo cp /opt/BUPT_edu_llm/nginx.conf /etc/nginx/sites-available/edubeam.cn.conf
+sudo cp /data/BUPT_edu_llm/nginx.conf /etc/nginx/sites-available/edubeam.cn.conf
 
 # 或用户目录部署（需要先修改 nginx.conf 中的 root 路径）
 sudo cp /home/bupt_llm/BUPT_edu_llm/nginx.conf /etc/nginx/sites-available/edubeam.cn.conf
@@ -400,8 +400,8 @@ sudo systemctl restart nginx
 curl -X POST http://127.0.0.1:5001/api/refresh
 
 # 或使用命令行
-cd /opt/BUPT_edu_llm/projects/alpha_sentiment
-/opt/BUPT_edu_llm/.venv/bin/python -m backend.services.data_generator --run
+cd /data/BUPT_edu_llm/projects/alpha_sentiment
+/data/BUPT_edu_llm/.venv/bin/python -m backend.services.data_generator --run
 ```
 
 ## 故障排查
@@ -472,10 +472,10 @@ sudo firewall-cmd --reload
 
 ```bash
 # Solar News Crawler 数据
-ls -la /opt/BUPT_edu_llm/projects/solar_news_crawler/data/
+ls -la /data/BUPT_edu_llm/projects/solar_news_crawler/data/
 
 # Alpha Sentiment 数据
-ls -la /opt/BUPT_edu_llm/projects/alpha_sentiment/data/
+ls -la /data/BUPT_edu_llm/projects/alpha_sentiment/data/
 ```
 
 ### 5. 内存不足
@@ -524,7 +524,7 @@ location /solar_news/ {
 
 ```bash
 # 清理 30 天前的数据文件（可选）
-find /opt/BUPT_edu_llm/projects/*/data -name "*.json" -mtime +30 -delete
+find /data/BUPT_edu_llm/projects/*/data -name "*.json" -mtime +30 -delete
 ```
 
 ## 监控与告警
@@ -567,8 +567,8 @@ mkdir -p $BACKUP_DIR
 
 # 备份所有项目的数据文件
 tar -czf $BACKUP_DIR/data_backup_$DATE.tar.gz \
-    /opt/BUPT_edu_llm/projects/solar_news_crawler/data \
-    /opt/BUPT_edu_llm/projects/alpha_sentiment/data
+    /data/BUPT_edu_llm/projects/solar_news_crawler/data \
+    /data/BUPT_edu_llm/projects/alpha_sentiment/data
 
 # 删除 30 天前的备份
 find $BACKUP_DIR -name "data_backup_*.tar.gz" -mtime +30 -delete
@@ -578,7 +578,7 @@ find $BACKUP_DIR -name "data_backup_*.tar.gz" -mtime +30 -delete
 
 ```bash
 tar -czf ~/config_backup_$(date +%Y%m%d).tar.gz \
-    /opt/BUPT_edu_llm/projects/*/.env \
+    /data/BUPT_edu_llm/projects/*/.env \
     /etc/nginx/sites-available/edubeam.cn.conf \
     /etc/systemd/system/solar-news-crawler.service \
     /etc/systemd/system/alpha-sentiment.service
